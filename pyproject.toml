@@ -1,0 +1,119 @@
+[project]
+name = "cml-mcp-server"
+version = "1.0.0"
+description = "Cloudera ML Model Context Protocol (MCP) Server"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Cloudera ML MCP Team"}
+]
+keywords = ["mcp", "cloudera", "ml", "oauth", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers", 
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    # Core FastMCP dependency (replaces mcp)
+    "fastmcp>=2.11.0",
+    "requests>=2.28.0",
+    "python-dotenv>=1.0.0",
+    
+    # HTTP server dependencies (for http_server.py)
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "sse-starlette>=2.0.0",
+    
+    # OAuth 2.1 dependencies
+    "pyjwt>=2.8.0",
+    "cryptography>=41.0.0",
+    
+    # Utility dependencies
+    "httpx>=0.28.0",
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+# Note: cmlapi must be installed separately from your Cloudera ML instance - see README
+# FastMCP provides the MCP protocol implementation with built-in HTTP support
+
+[project.urls]
+Homepage = "https://github.infra.cloudera.com/khauneesh/cml_mcp_server"
+Documentation = "https://github.infra.cloudera.com/khauneesh/cml_mcp_server#readme"
+Repository = "https://github.infra.cloudera.com/khauneesh/cml_mcp_server.git"
+"Bug Tracker" = "https://github.infra.cloudera.com/khauneesh/cml_mcp_server/issues"
+
+[project.scripts]
+cml-mcp-stdio = "cml_mcp_server.stdio_server:main"
+cml-mcp-http = "cml_mcp_server.http_server:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cml_mcp_server*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt", "*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+"tests/**/*" = ["B011"]   # assert statements in tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
