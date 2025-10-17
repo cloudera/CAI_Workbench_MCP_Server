@@ -30,10 +30,10 @@ If you're running inside a Cloudera ML workspace/session:
 
 ```bash
 # Install and run with STDIO (recommended)
-uvx --from git+https://github.infra.cloudera.com/khauneesh/cml_mcp_server.git cml-mcp-stdio
+uvx --from git+https://github.com/cloudera/CML_MCP_Server.git cml-mcp-stdio
 
 # Or for HTTP server (development only)
-uvx --from git+https://github.infra.cloudera.com/khauneesh/cml_mcp_server.git cml-mcp-http
+uvx --from git+https://github.com/cloudera/CML_MCP_Server.git cml-mcp-http
 ```
 
 ### Option 2: Docker (Recommended)
@@ -42,7 +42,7 @@ Configure your CML domain first - see [SETUP.md](./SETUP.md).
 
 ```bash
 # Clone repository
-git clone https://github.infra.cloudera.com/khauneesh/cml_mcp_server.git
+git clone https://github.com/cloudera/CML_MCP_Server.git
 cd cml_mcp_server
 
 # Configure your CML domain in Makefile
@@ -58,7 +58,7 @@ See [DOCKER.md](./DOCKER.md) for Docker documentation.
 
 #### 1. Clone and setup
 ```bash
-git clone https://github.infra.cloudera.com/khauneesh/cml_mcp_server.git
+git clone https://github.com/cloudera/CML_MCP_Server.git
 cd cml_mcp_server
 uv sync
 ```
@@ -321,4 +321,16 @@ create_model_deployment_tool(
 - [FastMCP](https://gofastmcp.com/) - The MCP framework
 - [Cloudera Machine Learning](https://docs.cloudera.com/machine-learning/) - CML documentation
 - [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
+
+---
+
+## Legal Notice
+
+**IMPORTANT: Please read the following before proceeding.**
+
+Cloudera, Inc. ("Cloudera") makes available to you this optional software, which may include accelerators for machine learning projects ("AMPs"), Hugging Face Spaces, or AI models, constitutes reference machine learning projects ("Reference Projects"). By configuring and launching this Reference Project, you acknowledge and assume the risk that using Reference Projects may (i) cause third party software, such as third-party large language models, to be downloaded directly into your environment and/or (ii) enable third-party services, such as third-party AI services, and transmission of data and metadata to such third-party services providers. Any such third-party software is not validated or maintained by Cloudera. Any support provided for Reference Projects is at Cloudera's sole discretion. You agree to comply with any applicable license terms or terms of use, including any third-party license terms, for Reference Projects.
+
+If you do not wish to download and install the third party software packages, do not configure, launch or otherwise use this Reference Project. By configuring, launching or otherwise using the Reference Project, you acknowledge the foregoing statement and agree that Cloudera is not responsible or liable in any way for any third party software packages.
+
+*Copyright (c) 2025 - Cloudera, Inc. All rights reserved.*
 
