@@ -2,7 +2,7 @@
 
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -49,26 +49,25 @@ def delete_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]
     if not api_key:
         return {"success": False, "message": "Missing api_key in configuration"}
     
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
     # First, try to get the job details to include in the response
     job_url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}"
     print(f"Getting job details from: {job_url}")
     
-    # Construct curl command for getting job details
-    get_job_cmd = [
-        "curl", "-s",
-        "-H", f"Authorization: Bearer {api_key}",
-        job_url
-    ]
-    
     job_name = f"Job ID {job_id}"
     try:
-        # Execute curl command to get job details
-        job_result = subprocess.run(get_job_cmd, capture_output=True, text=True)
+        # Make GET request to get job details
+        job_response = requests.get(job_url, headers=headers, timeout=30)
         
         # If successful, parse the job name
-        if job_result.returncode == 0 and job_result.stdout.strip():
+        if job_response.status_code < 400 and job_response.text.strip():
             try:
-                job_info = json.loads(job_result.stdout)
+                job_info = job_response.json()
                 job_name = job_info.get("name", job_name)
             except json.JSONDecodeError:
                 # If we can't parse the response, continue with deletion anyway
@@ -81,49 +80,47 @@ def delete_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]
     delete_url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}"
     print(f"Deleting job with URL: {delete_url}")
     
-    # Construct curl command for deletion
-    curl_cmd = [
-        "curl", "-s", "-X", "DELETE",
-        "-H", f"Authorization: Bearer {api_key}",
-        delete_url
-    ]
-    
     try:
-        # Execute curl command with debug output
-        print(f"Executing curl command: {' '.join(curl_cmd)}")
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
-        print(f"Curl exit code: {result.returncode}")
-        print(f"Curl stdout: '{result.stdout}'")
-        print(f"Curl stderr: '{result.stderr}'")
+        # Make DELETE request
+        response = requests.delete(delete_url, headers=headers, timeout=30)
+        print(f"Response status code: {response.status_code}")
+        print(f"Response content: '{response.text}'")
         
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to delete job: {result.stderr}"
-            }
-        
-        # Parse the response if there is any content
-        if result.stdout.strip():
+        # Check if request was successful
+        if response.status_code >= 400:
             try:
-                response = json.loads(result.stdout)
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to delete job: HTTP {response.status_code}"
+                }
+        
+        # Parse response if there is content
+        if response.text.strip():
+            try:
+                response_data = response.json()
                 
                 # Check if there's an error in the response
-                if "error" in response:
+                if "error" in response_data:
                     return {
-                        "success": False, 
-                        "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                        "details": response.get("error", {})
+                        "success": False,
+                        "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                        "details": response_data.get("error", {})
                     }
                 
                 return {
                     "success": True,
                     "message": f"Successfully deleted '{job_name}'",
                     "job_id": job_id,
-                    "data": response
+                    "data": response_data
                 }
             except json.JSONDecodeError:
-                # If the response is not JSON, it might be empty for a successful deletion
                 pass
         
         # If we got here, the deletion was likely successful but returned no content
@@ -133,6 +130,11 @@ def delete_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]
             "job_id": job_id
         }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error deleting job: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

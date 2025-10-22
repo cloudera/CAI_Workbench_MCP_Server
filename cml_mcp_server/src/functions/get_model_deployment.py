@@ -2,7 +2,7 @@
 
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -60,45 +60,41 @@ def get_model_deployment(config: Dict[str, str], params: Dict[str, Any]) -> Dict
     api_url = f"{host}/api/v1/projects/{project_id}/models/{model_id}/deployments/{deployment_id}"
     
     # Set up headers
-    headers = [
-        '-H', f'Authorization: Bearer {config["api_key"]}',
-        '-H', 'Content-Type: application/json'
-    ]
-    
-    # Construct curl command
-    curl_command = ['curl', '-s', '-X', 'GET']
-    curl_command.extend(headers)
-    curl_command.append(api_url)
+    headers = {
+        'Authorization': f'Bearer {config["api_key"]}',
+        'Content-Type': 'application/json'
+    }
     
     try:
-        # Execute the curl command
-        process = subprocess.run(
-            curl_command,
-            capture_output=True,
-            text=True,
-            check=False
-        )
+        # Make GET request
+        response = requests.get(api_url, headers=headers, timeout=30)
         
-        # Check if the command was successful
-        if process.returncode != 0:
+        # Check if request was successful
+        if response.status_code >= 400:
             return {
                 'success': False,
-                'message': f'Failed to get model deployment: {process.stderr}'
+                'message': f'Failed to get model deployment: HTTP {response.status_code}',
+                'error': response.text
             }
         
         # Parse the response
         try:
-            response = json.loads(process.stdout)
+            response_data = response.json()
             return {
                 'success': True,
-                'data': response
+                'data': response_data
             }
         except json.JSONDecodeError:
             return {
                 'success': False,
-                'message': f'Invalid JSON response: {process.stdout}'
+                'message': f'Invalid JSON response: {response.text}'
             }
     
+    except requests.RequestException as e:
+        return {
+            'success': False,
+            'message': f'Error getting model deployment: {str(e)}'
+        }
     except Exception as e:
         return {
             'success': False,

@@ -7,7 +7,6 @@ SECURITY BEST PRACTICES DEMONSTRATION:
 
 import os
 import json
-import subprocess
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -55,24 +54,6 @@ def get_experiment(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, 
     
     # ❌ INCORRECT PRACTICE - SECURITY VULNERABILITY (commented out)
     # This approach exposes API keys in process list via subprocess arguments
-    """
-    # Set up headers
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {config.get('api_key', '')}"
-    }
-    
-    # Construct curl command - EXPOSES API KEY IN PROCESS LIST!
-    curl_command = [
-        "curl", "-s", "-X", "GET",
-        "-H", f"Content-Type: {headers['Content-Type']}",
-        "-H", f"Authorization: {headers['Authorization']}",  # ⚠️ VISIBLE TO ALL USERS!
-        url
-    ]
-    
-    # Execute curl command - INSECURE!
-    result = subprocess.run(curl_command, capture_output=True, text=True)
-    """
     
     # ✅ CORRECT PRACTICE - SECURE IMPLEMENTATION
     try:

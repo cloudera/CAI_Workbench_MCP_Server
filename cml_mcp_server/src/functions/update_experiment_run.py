@@ -2,7 +2,7 @@
 
 import json
 import os
-import subprocess
+import requests
 from urllib.parse import urlparse
 
 
@@ -88,34 +88,30 @@ def update_experiment_run(config, params=None):
         if params.get(key) is not None:
             request_data[key] = params[key]
     
-    # Prepare the curl command
-    curl_command = [
-        'curl', '-s',
-        '-X', 'PATCH',
-        '-H', f"Authorization: Bearer {config.get('api_key', '')}",
-        '-H', 'Content-Type: application/json',
-        '-d', json.dumps(request_data),
-        url
-    ]
+    # Prepare headers with API key
+    headers = {
+        "Authorization": f"Bearer {config.get('api_key', '')}",
+        "Content-Type": "application/json"
+    }
 
-    # Execute the curl command
+    # Execute the PATCH request using requests library (secure)
     try:
-        response = subprocess.run(
-            curl_command,
-            capture_output=True,
-            text=True,
-            check=False
+        response = requests.patch(
+            url,
+            headers=headers,
+            json=request_data,
+            timeout=30
         )
 
-        if response.returncode != 0:
+        if response.status_code >= 400:
             return {
                 "success": False,
-                "message": f"Failed to execute curl command: {response.stderr}",
+                "message": f"API request failed with status {response.status_code}: {response.text}",
                 "data": None
             }
 
         try:
-            data = json.loads(response.stdout)
+            data = response.json()
             return {
                 "success": True,
                 "message": f"Successfully updated experiment run {run_id}",
@@ -124,13 +120,13 @@ def update_experiment_run(config, params=None):
         except json.JSONDecodeError:
             return {
                 "success": False,
-                "message": f"Failed to parse response as JSON: {response.stdout}",
+                "message": f"Failed to parse response as JSON: {response.text}",
                 "data": None
             }
-    except subprocess.SubprocessError as e:
+    except requests.RequestException as e:
         return {
             "success": False,
-            "message": f"Failed to execute curl command: {str(e)}",
+            "message": f"API request error: {str(e)}",
             "data": None
         }
     except Exception as e:

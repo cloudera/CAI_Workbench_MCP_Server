@@ -3,7 +3,7 @@ Create a new model deployment in Cloudera ML
 """
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -77,58 +77,65 @@ def create_model_deployment(config: Dict[str, str], params: Dict[str, Any]) -> D
         if param_key in params and params[param_key] is not None:
             request_data[request_key] = params[param_key]
     
-    # Format request data as JSON
-    request_data_json = json.dumps(request_data)
-    
     # Debug print URLs
     project_id = params["project_id"]
     model_id = params["model_id"]
     api_url = f"{host}/api/v2/projects/{project_id}/models/{model_id}/deployments"
     print(f"Creating model deployment with URL: {api_url}")
     
-    # Construct curl command for API request
-    curl_cmd = [
-        "curl", "-s", "-X", "POST",
-        "-H", f"Authorization: Bearer {api_key}",
-        "-H", "Content-Type: application/json",
-        "-d", request_data_json,
-        api_url
-    ]
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
     
     try:
-        # Execute curl command
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        # Make POST request
+        response = requests.post(api_url, headers=headers, json=request_data, timeout=30)
         
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to create model deployment: {result.stderr}"
-            }
+        # Check if request was successful
+        if response.status_code >= 400:
+            try:
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to create model deployment: HTTP {response.status_code}"
+                }
         
         # Parse the response
         try:
-            response = json.loads(result.stdout)
+            response_data = response.json()
             
             # Check if there's an error in the response
-            if "error" in response:
+            if "error" in response_data:
                 return {
-                    "success": False, 
-                    "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                    "details": response.get("error", {})
+                    "success": False,
+                    "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": response_data.get("error", {})
                 }
             
             return {
                 "success": True,
                 "message": f"Successfully created deployment '{params['name']}' for model '{model_id}'",
-                "data": response
+                "data": response_data
             }
         except json.JSONDecodeError:
             return {
                 "success": False,
-                "message": f"Failed to parse response: {result.stdout}"
+                "message": f"Failed to parse response: {response.text}"
             }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error creating model deployment: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

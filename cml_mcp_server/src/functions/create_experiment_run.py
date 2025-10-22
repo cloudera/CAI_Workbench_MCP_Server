@@ -3,7 +3,7 @@ Create a new experiment run in Cloudera ML
 """
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any, List, Optional
 
@@ -67,56 +67,63 @@ def create_experiment_run(config: Dict[str, str], params: Dict[str, Any]) -> Dic
     if "tags" in params and params["tags"]:
         request_data["tags"] = params["tags"]
     
-    # Format request data as JSON
-    request_data_json = json.dumps(request_data)
-    
     # Debug print URLs
     api_url = f"{host}/api/v2/projects/{params['project_id']}/experiments/{params['experiment_id']}/runs"
     print(f"Creating experiment run with URL: {api_url}")
     
-    # Construct curl command
-    curl_cmd = [
-        "curl", "-s", "-X", "POST",
-        "-H", f"Authorization: Bearer {api_key}",
-        "-H", "Content-Type: application/json",
-        "-d", request_data_json,
-        api_url
-    ]
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
     
     try:
-        # Execute curl command
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        # Make POST request
+        response = requests.post(api_url, headers=headers, json=request_data, timeout=30)
         
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to create experiment run: {result.stderr}"
-            }
+        # Check if request was successful
+        if response.status_code >= 400:
+            try:
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to create experiment run: HTTP {response.status_code}"
+                }
         
         # Parse the response
         try:
-            response = json.loads(result.stdout)
+            response_data = response.json()
             
             # Check if there's an error in the response
-            if "error" in response:
+            if "error" in response_data:
                 return {
-                    "success": False, 
-                    "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                    "details": response.get("error", {})
+                    "success": False,
+                    "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": response_data.get("error", {})
                 }
             
             return {
                 "success": True,
                 "message": f"Successfully created experiment run",
-                "data": response
+                "data": response_data
             }
         except json.JSONDecodeError:
             return {
                 "success": False,
-                "message": f"Failed to parse response: {result.stdout}"
+                "message": f"Failed to parse response: {response.text}"
             }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error creating experiment run: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

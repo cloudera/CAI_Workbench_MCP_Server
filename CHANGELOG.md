@@ -1,56 +1,74 @@
 # Changelog
 
-## Latest Cleanup and Documentation Update
+All notable changes to the CML MCP Server will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Comprehensive test suite (`test_all_functions.py`) with 11 unit tests
+- FastMCP integration tests (`test_cml_mcp_client.py`)
+- Security vulnerability detection tests
+- Comprehensive test documentation in `tests/README.md`
 
 ### Changed
-- **Removed `server.py`**: Eliminated the legacy compatibility file entirely
-- **Updated Claude Desktop config**: Now uses `cml_mcp_server.stdio_server` directly
-- **Removed legacy entry point**: `cml-mcp-server` command no longer exists
-- **Cleaner documentation**: Removed all references to the old server.py approach
-- **Completed `stdio_server.py`**: Added all 47 tool definitions (was only 7)
-- **Fixed imports**: Added try/except for package vs direct execution
+- **SECURITY**: Replaced all `subprocess.run` calls with secure `requests` library (46 files)
+- API keys now transmitted securely in HTTPS headers instead of process arguments
+- Updated all function error handling to use `requests.RequestException`
+- Improved timeout handling (30s timeout on all API calls)
 
-### Benefits
-- Cleaner codebase with no legacy code
-- Direct usage of appropriate server files (stdio_server.py or http_server.py)
-- Clear separation of concerns
-- Both server files are now complete and self-contained
+### Fixed
+- **CRITICAL**: API key exposure vulnerability in process list (CVE-pending)
+- Error messages now properly report HTTP status codes
+- JSON parsing errors now provide better debugging information
 
-## Major Refactoring (Previous Update)
+### Security
+- Eliminated subprocess-based API calls that exposed credentials
+- All HTTP requests now use proper header-based authentication
+- Added comprehensive security testing in CI/CD pipeline
 
-### Code Organization
-- **Split server implementations**: Separated STDIO and HTTP into distinct files
-  - `stdio_server.py` - Clean STDIO-only implementation
-  - `http_server.py` - HTTP server with all endpoints
-- **Fixed HTTP issues**: Working `/mcp-api` endpoint with proper initialization
-- **Simplified imports**: Clear separation of concerns
+---
 
-### Server Improvements
-- Added `initialize` method to `/mcp-api` endpoint (fixes 404 errors)
-- All 47 tools now accessible via HTTP with working implementation
-- HTTP transport clearly marked as "development only" without authentication
-- Debug endpoints: `/test`, `/debug/tools`, `/debug/call` for easy testing
+## [1.0.0] - 2025-10-22
 
-### Entry Points
-- `cml-mcp-stdio` - Runs stdio_server.py
-- `cml-mcp-http` - Runs http_server.py
+### Added
+- Initial public release
+- Apache 2.0 license
+- NOTICE.txt with third-party attributions
+- 47+ MCP tools for Cloudera ML operations
+- Support for:
+  - Project management
+  - Job creation and management
+  - Model building and deployment
+  - Experiment tracking
+  - File operations
+  - Application management
+- FastMCP-based HTTP and stdio servers
+- OAuth 2.1 support
+- Comprehensive README documentation
 
-### Documentation
-- Updated README with new server structure
-- Clear examples for both STDIO and HTTP modes
-- Removed OAuth sections (future feature)
-- Added troubleshooting section
+### Changed
+- Migrated from private to public repository
+- Updated all repository URLs to `github.com/cloudera/CML_MCP_Server`
+- Updated license from MIT to Apache 2.0
+- Added legal notices for third-party dependencies
 
-### Key Fixes
-- Fixed "Tool not callable" errors by using direct function mappings
-- Fixed 404 errors by adding proper initialize method
-- Maintained backward compatibility while improving structure
+---
 
-### Usage
-```bash
-# STDIO (recommended)
-uv run -m cml_mcp_server.stdio_server
+## Types of Changes
 
-# HTTP (development)
-uv run -m cml_mcp_server.http_server
-```
+- `Added` for new features
+- `Changed` for changes in existing functionality
+- `Deprecated` for soon-to-be removed features
+- `Removed` for now removed features
+- `Fixed` for any bug fixes
+- `Security` for vulnerability fixes
+
+---
+
+## Release Links
+
+- [Unreleased](https://github.com/cloudera/CML_MCP_Server/compare/v1.0.0...HEAD)
+- [1.0.0](https://github.com/cloudera/CML_MCP_Server/releases/tag/v1.0.0)
