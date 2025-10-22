@@ -7,7 +7,6 @@ SECURITY BEST PRACTICES DEMONSTRATION:
 """
 import os
 import json
-import subprocess
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -60,22 +59,6 @@ def batch_list_projects(config: Dict[str, str], params: Dict[str, Any]) -> Dict[
     # ❌ INCORRECT PRACTICE - SECURITY VULNERABILITY (commented out)
     # This approach exposes API keys in process list via subprocess arguments
     # Anyone can see the API key using: ps aux | grep curl
-    """
-    # Format request data as JSON
-    request_data_json = json.dumps(request_data)
-    
-    # Construct curl command - EXPOSES API KEY IN PROCESS LIST!
-    curl_cmd = [
-        "curl", "-s", "-X", "POST",
-        "-H", f"Authorization: Bearer {api_key}",  # ⚠️ VISIBLE TO ALL USERS!
-        "-H", "Content-Type: application/json",
-        "-d", request_data_json,
-        api_url
-    ]
-    
-    # Execute curl command - INSECURE!
-    result = subprocess.run(curl_cmd, capture_output=True, text=True)
-    """
     
     # ✅ CORRECT PRACTICE - SECURE IMPLEMENTATION
     # API keys are not exposed in process list, proper error handling, retries, etc.

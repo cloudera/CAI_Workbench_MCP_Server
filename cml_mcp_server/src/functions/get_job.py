@@ -2,7 +2,7 @@
 
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -49,40 +49,38 @@ def get_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
         "Authorization": f"Bearer {config.get('api_key', '')}"
     }
     
-    # Construct curl command
-    curl_command = [
-        "curl", "-s", "-X", "GET",
-        "-H", f"Content-Type: {headers['Content-Type']}",
-        "-H", f"Authorization: {headers['Authorization']}",
-        url
-    ]
-    
     print(f"DEBUG: Accessing URL: {url}")
     
     try:
-        # Execute curl command
-        result = subprocess.run(curl_command, capture_output=True, text=True)
+        # Make GET request
+        response = requests.get(url, headers=headers, timeout=30)
         
-        # Check if the command was successful
-        if result.returncode == 0:
-            try:
-                response_data = json.loads(result.stdout)
-                return {
-                    "success": True,
-                    "data": response_data
-                }
-            except json.JSONDecodeError:
-                return {
-                    "success": False,
-                    "message": "Failed to parse API response",
-                    "raw_response": result.stdout
-                }
-        else:
+        # Check if request was successful
+        if response.status_code >= 400:
             return {
                 "success": False,
-                "message": f"API request failed with status code {result.returncode}",
-                "error": result.stderr
+                "message": f"API request failed with HTTP {response.status_code}",
+                "error": response.text
             }
+        
+        try:
+            response_data = response.json()
+            return {
+                "success": True,
+                "data": response_data
+            }
+        except json.JSONDecodeError:
+            return {
+                "success": False,
+                "message": "Failed to parse API response",
+                "raw_response": response.text
+            }
+    
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error executing request: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

@@ -3,7 +3,7 @@ Create a run for an existing job in Cloudera ML
 """
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -70,66 +70,65 @@ def create_job_run(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, 
         if param_key in params and params[param_key] is not None:
             request_data[request_key] = params[param_key]
     
-    # Format request data as JSON
-    request_data_json = json.dumps(request_data)
-    
     # Debug print URLs
     project_id = params["project_id"]
     job_id = params["job_id"]
     api_url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}/runs"
     print(f"Creating job run with URL: {api_url}")
     
-    # Construct curl command
-    curl_cmd = [
-        "curl", "-s", "-X", "POST",
-        "-H", f"Authorization: Bearer {api_key}",
-        "-H", "Content-Type: application/json",
-        "-d", request_data_json,
-        api_url
-    ]
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
     
     try:
-        # Execute curl command
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        # Make POST request
+        response = requests.post(api_url, headers=headers, json=request_data, timeout=30)
         
-        # Debug the result
-        print(f"curl result type: {type(result)}")
-        print(f"curl returncode: {result.returncode}")
-        print(f"curl stdout type: {type(result.stdout)}")
-        print(f"curl stdout (first 200 chars): {result.stdout[:200]}")
-        
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to create job run: {result.stderr}"
-            }
+        # Check if request was successful
+        if response.status_code >= 400:
+            try:
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to create job run: HTTP {response.status_code}"
+                }
         
         # Parse the response
         try:
-            print("Attempting to parse JSON response...")
-            response = json.loads(result.stdout)
-            print(f"Response parsed successfully. Type: {type(response)}")
+            response_data = response.json()
             
             # Check if there's an error in the response
-            if "error" in response:
+            if "error" in response_data:
                 return {
-                    "success": False, 
-                    "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                    "details": response.get("error", {})
+                    "success": False,
+                    "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": response_data.get("error", {})
                 }
             
             return {
                 "success": True,
                 "message": f"Successfully created run for job '{job_id}'",
-                "data": response
+                "data": response_data
             }
         except json.JSONDecodeError:
             return {
                 "success": False,
-                "message": f"Failed to parse response: {result.stdout}"
+                "message": f"Failed to parse response: {response.text}"
             }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error creating job run: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

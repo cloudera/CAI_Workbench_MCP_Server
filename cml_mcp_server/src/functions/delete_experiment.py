@@ -7,7 +7,6 @@ SECURITY BEST PRACTICES DEMONSTRATION:
 """
 import os
 import json
-import subprocess
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -58,17 +57,6 @@ def delete_experiment(config: Dict[str, str], params: Dict[str, Any]) -> Dict[st
     
     # ❌ INCORRECT PRACTICE - SECURITY VULNERABILITY (commented out)
     # This approach exposes API keys in process list via subprocess arguments
-    """
-    # Construct curl command - EXPOSES API KEY IN PROCESS LIST!
-    curl_cmd = [
-        "curl", "-s", "-X", "DELETE",
-        "-H", f"Authorization: Bearer {api_key}",  # ⚠️ VISIBLE TO ALL USERS!
-        api_url
-    ]
-    
-    # Execute curl command - INSECURE!
-    result = subprocess.run(curl_cmd, capture_output=True, text=True)
-    """
     
     # ✅ CORRECT PRACTICE - SECURE IMPLEMENTATION
     try:

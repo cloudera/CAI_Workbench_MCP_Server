@@ -2,7 +2,7 @@
 
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse
 from typing import Dict, Any
 
@@ -47,26 +47,25 @@ def delete_model(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, An
     if not api_key:
         return {"success": False, "message": "Missing api_key in configuration"}
     
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
     # First, try to get the model details to include in the response
     model_url = f"{host}/api/v2/projects/{project_id}/models/{model_id}"
     print(f"Getting model details from: {model_url}")
     
-    # Construct curl command for getting model details
-    get_model_cmd = [
-        "curl", "-s",
-        "-H", f"Authorization: Bearer {api_key}",
-        model_url
-    ]
-    
     model_name = f"Model ID {model_id}"
     try:
-        # Execute curl command to get model details
-        model_result = subprocess.run(get_model_cmd, capture_output=True, text=True)
+        # Make GET request to get model details
+        model_response = requests.get(model_url, headers=headers, timeout=30)
         
         # If successful, parse the model name
-        if model_result.returncode == 0 and model_result.stdout.strip():
+        if model_response.status_code < 400 and model_response.text.strip():
             try:
-                model_info = json.loads(model_result.stdout)
+                model_info = model_response.json()
                 model_name = model_info.get("name", model_name)
             except json.JSONDecodeError:
                 # If we can't parse the response, continue with deletion anyway
@@ -79,45 +78,45 @@ def delete_model(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, An
     delete_url = f"{host}/api/v2/projects/{project_id}/models/{model_id}"
     print(f"Deleting model with URL: {delete_url}")
     
-    # Construct curl command for deletion
-    curl_cmd = [
-        "curl", "-s", "-X", "DELETE",
-        "-H", f"Authorization: Bearer {api_key}",
-        delete_url
-    ]
-    
     try:
-        # Execute curl command
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        # Make DELETE request
+        response = requests.delete(delete_url, headers=headers, timeout=30)
         
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to delete model: {result.stderr}"
-            }
-        
-        # Parse the response if there is any content
-        if result.stdout.strip():
+        # Check if request was successful
+        if response.status_code >= 400:
             try:
-                response = json.loads(result.stdout)
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to delete model: HTTP {response.status_code}"
+                }
+        
+        # Parse response if there is content
+        if response.text.strip():
+            try:
+                response_data = response.json()
                 
                 # Check if there's an error in the response
-                if "error" in response:
+                if "error" in response_data:
                     return {
-                        "success": False, 
-                        "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                        "details": response.get("error", {})
+                        "success": False,
+                        "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                        "details": response_data.get("error", {})
                     }
                 
                 return {
                     "success": True,
                     "message": f"Successfully deleted model '{model_name}'",
                     "model_id": model_id,
-                    "data": response
+                    "data": response_data
                 }
             except json.JSONDecodeError:
-                # If the response is not JSON, it might be empty for a successful deletion
                 pass
         
         # If we got here, the deletion was likely successful but returned no content
@@ -127,6 +126,11 @@ def delete_model(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, An
             "model_id": model_id
         }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error deleting model: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

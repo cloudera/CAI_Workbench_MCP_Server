@@ -2,7 +2,7 @@
 
 import os
 import json
-import subprocess
+import requests
 from urllib.parse import urlparse, quote
 from typing import Dict, Any
 
@@ -54,45 +54,51 @@ def delete_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[
     delete_url = f"{host}/api/v2/projects/{project_id}/files?path={encoded_file_path}"
     print(f"Deleting project file with URL: {delete_url}")
     
-    # Construct curl command for deletion
-    curl_cmd = [
-        "curl", "-s", "-X", "DELETE",
-        "-H", f"Authorization: Bearer {api_key}",
-        delete_url
-    ]
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
     
     try:
-        # Execute curl command
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        # Make DELETE request
+        response = requests.delete(delete_url, headers=headers, timeout=30)
         
-        # Check if the curl command was successful
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "message": f"Failed to delete file: {result.stderr}"
-            }
-        
-        # Parse the response if there is any content
-        if result.stdout.strip():
+        # Check if request was successful
+        if response.status_code >= 400:
             try:
-                response = json.loads(result.stdout)
+                error_data = response.json()
+                return {
+                    "success": False,
+                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
+                    "details": error_data.get("error", {})
+                }
+            except:
+                return {
+                    "success": False,
+                    "message": f"Failed to delete file: HTTP {response.status_code}"
+                }
+        
+        # Parse response if there is content
+        if response.text.strip():
+            try:
+                response_data = response.json()
                 
                 # Check if there's an error in the response
-                if "error" in response:
+                if "error" in response_data:
                     return {
-                        "success": False, 
-                        "message": f"API error: {response.get('error', {}).get('message', 'Unknown error')}",
-                        "details": response.get("error", {})
+                        "success": False,
+                        "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
+                        "details": response_data.get("error", {})
                     }
                 
                 return {
                     "success": True,
                     "message": f"Successfully deleted '{file_path}'",
                     "file_path": file_path,
-                    "data": response
+                    "data": response_data
                 }
             except json.JSONDecodeError:
-                # If the response is not JSON, it might be empty for a successful deletion
                 pass
         
         # If we got here, the deletion was likely successful but returned no content
@@ -102,6 +108,11 @@ def delete_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[
             "file_path": file_path
         }
     
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "message": f"Error deleting file: {str(e)}"
+        }
     except Exception as e:
         return {
             "success": False,

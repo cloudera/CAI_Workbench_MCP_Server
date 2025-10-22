@@ -2,7 +2,7 @@
 
 import json
 import os
-import subprocess
+import requests
 from urllib.parse import urlparse
 
 
@@ -66,33 +66,25 @@ def stop_application(config, params=None):
     
     print(f"Accessing: {url}")
 
-    # Prepare the curl command
-    curl_command = [
-        'curl', '-s',
-        '-X', 'POST',
-        '-H', f"Authorization: Bearer {config.get('api_key', '')}",
-        '-H', 'Content-Type: application/json',
-        url
-    ]
+    # Setup headers
+    headers = {
+        "Authorization": f"Bearer {config.get('api_key', '')}",
+        "Content-Type": "application/json"
+    }
 
-    # Execute the curl command
+    # Execute the request
     try:
-        response = subprocess.run(
-            curl_command,
-            capture_output=True,
-            text=True,
-            check=False
-        )
+        response = requests.post(url, headers=headers, timeout=30)
 
-        if response.returncode != 0:
+        if response.status_code >= 400:
             return {
                 "success": False,
-                "message": f"Failed to execute curl command: {response.stderr}",
+                "message": f"Failed to execute request: HTTP {response.status_code}",
                 "data": None
             }
 
         try:
-            data = json.loads(response.stdout)
+            data = response.json()
             return {
                 "success": True,
                 "message": f"Successfully stopped application {application_id}",
@@ -101,13 +93,13 @@ def stop_application(config, params=None):
         except json.JSONDecodeError:
             return {
                 "success": False,
-                "message": f"Failed to parse response as JSON: {response.stdout}",
+                "message": f"Failed to parse response as JSON: {response.text}",
                 "data": None
             }
-    except subprocess.SubprocessError as e:
+    except requests.RequestException as e:
         return {
             "success": False,
-            "message": f"Failed to execute curl command: {str(e)}",
+            "message": f"Failed to execute request: {str(e)}",
             "data": None
         }
     except Exception as e:
