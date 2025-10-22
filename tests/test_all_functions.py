@@ -65,7 +65,14 @@ from cml_mcp_server.src.functions.update_job import update_job
 from cml_mcp_server.src.functions.update_project import update_project
 from cml_mcp_server.src.functions.update_project_file_metadata import update_project_file_metadata
 from cml_mcp_server.src.functions.upload_file import upload_file
-from cml_mcp_server.src.functions.upload_folder import upload_folder
+
+# upload_folder requires cmlapi (optional dependency)
+try:
+    from cml_mcp_server.src.functions.upload_folder import upload_folder
+    HAS_UPLOAD_FOLDER = True
+except ImportError:
+    HAS_UPLOAD_FOLDER = False
+    upload_folder = None
 
 
 # =============================================================================
@@ -85,7 +92,7 @@ def mock_config():
 @pytest.fixture
 def all_functions():
     """List of all functions to test"""
-    return [
+    functions = [
         # Create operations
         (create_application, {"name": "test", "subdomain": "test", "script": "app.py"}),
         (create_experiment, {"name": "test", "project_id": "test"}),
@@ -143,8 +150,13 @@ def all_functions():
         
         # Upload operations
         (upload_file, {"file_path": "/tmp/test.txt", "target_name": "test.txt", "target_dir": "/", "project_id": "test"}),
-        (upload_folder, {"folder_path": "/tmp/test", "target_dir": "/", "project_id": "test"}),
     ]
+    
+    # Conditionally add upload_folder if cmlapi is available
+    if HAS_UPLOAD_FOLDER:
+        functions.append((upload_folder, {"folder_path": "/tmp/test", "target_dir": "/", "project_id": "test"}))
+    
+    return functions
 
 
 # =============================================================================
@@ -428,7 +440,10 @@ def test_all_modules_import_successfully():
     import cml_mcp_server.src.functions.update_project
     import cml_mcp_server.src.functions.update_project_file_metadata
     import cml_mcp_server.src.functions.upload_file
-    import cml_mcp_server.src.functions.upload_folder
+    
+    # upload_folder requires cmlapi (optional), only import if available
+    if HAS_UPLOAD_FOLDER:
+        import cml_mcp_server.src.functions.upload_folder
     
     # If we got here, all imports succeeded
     assert True

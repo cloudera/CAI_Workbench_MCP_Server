@@ -7,7 +7,6 @@ import datetime
 from pathlib import Path
 import requests
 from typing import Dict, Any, List, Optional
-import cmlapi
 
 
 def setup_client(host, api_key):
@@ -21,6 +20,14 @@ def setup_client(host, api_key):
     Returns:
         Configured CML API client
     """
+    # Lazy import cmlapi (optional dependency, only needed when function is called)
+    try:
+        import cmlapi
+    except ImportError:
+        raise ImportError(
+            "cmlapi is required for upload_folder. "
+            "Install it from your Cloudera ML instance as described in the README."
+        )
     # Properly format the host URL
     host = host.strip()
     # Remove duplicate https:// if present
