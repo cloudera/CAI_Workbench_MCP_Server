@@ -1,28 +1,28 @@
-# CML MCP Server
+# CAI Workbench MCP Server
 
 .DEFAULT_GOAL := help
 
-IMAGE_NAME := cml-mcp-server
+IMAGE_NAME := cai-workbench-mcp-server
 
 .PHONY: build
-build: ## Build Docker image - requires CLOUDERA_ML_HOST env var
-	@if [ -z "$$CLOUDERA_ML_HOST" ]; then \
-		echo "Error: CLOUDERA_ML_HOST environment variable required"; \
-		echo "Usage: CLOUDERA_ML_HOST=https://your-cml-instance.cloudera.site make build"; \
+build: ## Build Docker image - requires CAI_WORKBENCH_HOST env var
+	@if [ -z "$$CAI_WORKBENCH_HOST" ]; then \
+		echo "Error: CAI_WORKBENCH_HOST environment variable required"; \
+		echo "Usage: CAI_WORKBENCH_HOST=https://your-cai-instance.cloudera.site make build"; \
 		exit 1; \
 	fi
-	docker build --build-arg CLOUDERA_ML_HOST=$$CLOUDERA_ML_HOST -t $(IMAGE_NAME) .
+	docker build --build-arg CAI_WORKBENCH_HOST=$$CAI_WORKBENCH_HOST -t $(IMAGE_NAME) .
 .PHONY: run
 run: ## Run in STDIO mode (for Claude Desktop)
 	docker run -i --rm $(IMAGE_NAME)
 
 .PHONY: run-secrets
 run-secrets: ## Run with Docker secrets
-	docker-compose -f docker-compose.secrets.yml run --rm cml-mcp-server
+	docker-compose -f docker-compose.secrets.yml run --rm cai-workbench-mcp-server
 
 .PHONY: test
 test: ## Test STDIO transport
-	.venv/bin/python tests/test_cml_mcp_client.py --quick
+	.venv/bin/python tests/test_cai_mcp_client.py --quick
 
 .PHONY: clean
 clean: ## Remove Docker image

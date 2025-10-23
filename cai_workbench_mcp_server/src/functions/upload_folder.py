@@ -11,14 +11,14 @@ from typing import Dict, Any, List, Optional
 
 def setup_client(host, api_key):
     """
-    Setup the CML API client
+    Setup the CAI Workbench API client
     
     Args:
-        host: CML host URL
+        host: CAI Workbench host URL
         api_key: API key for authentication
         
     Returns:
-        Configured CML API client
+        Configured CAI Workbench API client
     """
     # Lazy import cmlapi (optional dependency, only needed when function is called)
     try:
@@ -51,7 +51,7 @@ def delete_file_if_exists(client, project_id, file_path):
     Try to delete a file if it exists to avoid conflicts
     
     Args:
-        client: CML API client
+        client: CAI Workbench API client
         project_id: ID of the project
         file_path: Path of the file to delete
     """
@@ -67,10 +67,10 @@ def delete_file_if_exists(client, project_id, file_path):
 
 def upload_file_to_project(host, api_key, project_id, file_path, relative_path):
     """
-    Upload a single file to Cloudera AI using direct PUT request
+    Upload a single file to Cloudera AI Workbench project using direct PUT request
     
     Args:
-        host: CML host URL
+        host: CAI Workbench host URL
         api_key: API key for authentication
         project_id: ID of the project to upload to
         file_path: Full path to the file to upload
@@ -120,7 +120,7 @@ def upload_file_to_project(host, api_key, project_id, file_path, relative_path):
 
 def upload_folder(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Upload a folder to Cloudera AI using direct PUT request
+    Upload a folder to Cloudera AI Workbench project using direct PUT request
     
     Args:
         config: MCP configuration

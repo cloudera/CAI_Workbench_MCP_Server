@@ -2,11 +2,11 @@
 ================================================================================
 
 
-Third-Party Software for cml_mcp_server
+Third-Party Software for cai_workbench_mcp_server
 
 --------------------------------------------------------------------------------
 
-The following 3rd-party software packages may be used by or distributed with cml_mcp_server. Any information relevant to third-party vendors listed below are collected using common, reasonable means.
+The following 3rd-party software packages may be used by or distributed with cai_workbench_mcp_server. Any information relevant to third-party vendors listed below are collected using common, reasonable means.
 
 Date generated: 2025-10-16
 

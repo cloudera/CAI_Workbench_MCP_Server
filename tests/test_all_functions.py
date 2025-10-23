@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive test suite for all CML MCP Server functions
+Comprehensive test suite for all CAI Workbench MCP Server functions
 Suitable for CI/CD pipeline unit testing
 
 This test suite covers all 47+ tools/functions in the repository with:
@@ -19,56 +19,56 @@ import inspect
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import all functions
-from cml_mcp_server.src.functions.batch_list_projects import batch_list_projects
-from cml_mcp_server.src.functions.create_application import create_application
-from cml_mcp_server.src.functions.create_experiment import create_experiment
-from cml_mcp_server.src.functions.create_experiment_run import create_experiment_run
-from cml_mcp_server.src.functions.create_job import create_job
-from cml_mcp_server.src.functions.create_job_run import create_job_run
-from cml_mcp_server.src.functions.create_model_build import create_model_build
-from cml_mcp_server.src.functions.create_model_deployment import create_model_deployment
-from cml_mcp_server.src.functions.delete_all_jobs import delete_all_jobs
-from cml_mcp_server.src.functions.delete_application import delete_application
-from cml_mcp_server.src.functions.delete_experiment import delete_experiment
-from cml_mcp_server.src.functions.delete_experiment_run import delete_experiment_run
-from cml_mcp_server.src.functions.delete_experiment_run_batch import delete_experiment_run_batch
-from cml_mcp_server.src.functions.delete_job import delete_job
-from cml_mcp_server.src.functions.delete_model import delete_model
-from cml_mcp_server.src.functions.delete_project_file import delete_project_file
-from cml_mcp_server.src.functions.get_application import get_application
-from cml_mcp_server.src.functions.get_experiment import get_experiment
-from cml_mcp_server.src.functions.get_experiment_run import get_experiment_run
-from cml_mcp_server.src.functions.get_job import get_job
-from cml_mcp_server.src.functions.get_job_run import get_job_run
-from cml_mcp_server.src.functions.get_model import get_model
-from cml_mcp_server.src.functions.get_model_build import get_model_build
-from cml_mcp_server.src.functions.get_model_deployment import get_model_deployment
-from cml_mcp_server.src.functions.get_project_id import get_project_id
-from cml_mcp_server.src.functions.get_runtimes import get_runtimes
-from cml_mcp_server.src.functions.list_applications import list_applications
-from cml_mcp_server.src.functions.list_experiments import list_experiments
-from cml_mcp_server.src.functions.list_job_runs import list_job_runs
-from cml_mcp_server.src.functions.list_jobs import list_jobs
-from cml_mcp_server.src.functions.list_model_builds import list_model_builds
-from cml_mcp_server.src.functions.list_model_deployments import list_model_deployments
-from cml_mcp_server.src.functions.list_models import list_models
-from cml_mcp_server.src.functions.list_project_files import list_project_files
-from cml_mcp_server.src.functions.log_experiment_run_batch import log_experiment_run_batch
-from cml_mcp_server.src.functions.restart_application import restart_application
-from cml_mcp_server.src.functions.stop_application import stop_application
-from cml_mcp_server.src.functions.stop_job_run import stop_job_run
-from cml_mcp_server.src.functions.stop_model_deployment import stop_model_deployment
-from cml_mcp_server.src.functions.update_application import update_application
-from cml_mcp_server.src.functions.update_experiment import update_experiment
-from cml_mcp_server.src.functions.update_experiment_run import update_experiment_run
-from cml_mcp_server.src.functions.update_job import update_job
-from cml_mcp_server.src.functions.update_project import update_project
-from cml_mcp_server.src.functions.update_project_file_metadata import update_project_file_metadata
-from cml_mcp_server.src.functions.upload_file import upload_file
+from cai_workbench_mcp_server.src.functions.batch_list_projects import batch_list_projects
+from cai_workbench_mcp_server.src.functions.create_application import create_application
+from cai_workbench_mcp_server.src.functions.create_experiment import create_experiment
+from cai_workbench_mcp_server.src.functions.create_experiment_run import create_experiment_run
+from cai_workbench_mcp_server.src.functions.create_job import create_job
+from cai_workbench_mcp_server.src.functions.create_job_run import create_job_run
+from cai_workbench_mcp_server.src.functions.create_model_build import create_model_build
+from cai_workbench_mcp_server.src.functions.create_model_deployment import create_model_deployment
+from cai_workbench_mcp_server.src.functions.delete_all_jobs import delete_all_jobs
+from cai_workbench_mcp_server.src.functions.delete_application import delete_application
+from cai_workbench_mcp_server.src.functions.delete_experiment import delete_experiment
+from cai_workbench_mcp_server.src.functions.delete_experiment_run import delete_experiment_run
+from cai_workbench_mcp_server.src.functions.delete_experiment_run_batch import delete_experiment_run_batch
+from cai_workbench_mcp_server.src.functions.delete_job import delete_job
+from cai_workbench_mcp_server.src.functions.delete_model import delete_model
+from cai_workbench_mcp_server.src.functions.delete_project_file import delete_project_file
+from cai_workbench_mcp_server.src.functions.get_application import get_application
+from cai_workbench_mcp_server.src.functions.get_experiment import get_experiment
+from cai_workbench_mcp_server.src.functions.get_experiment_run import get_experiment_run
+from cai_workbench_mcp_server.src.functions.get_job import get_job
+from cai_workbench_mcp_server.src.functions.get_job_run import get_job_run
+from cai_workbench_mcp_server.src.functions.get_model import get_model
+from cai_workbench_mcp_server.src.functions.get_model_build import get_model_build
+from cai_workbench_mcp_server.src.functions.get_model_deployment import get_model_deployment
+from cai_workbench_mcp_server.src.functions.get_project_id import get_project_id
+from cai_workbench_mcp_server.src.functions.get_runtimes import get_runtimes
+from cai_workbench_mcp_server.src.functions.list_applications import list_applications
+from cai_workbench_mcp_server.src.functions.list_experiments import list_experiments
+from cai_workbench_mcp_server.src.functions.list_job_runs import list_job_runs
+from cai_workbench_mcp_server.src.functions.list_jobs import list_jobs
+from cai_workbench_mcp_server.src.functions.list_model_builds import list_model_builds
+from cai_workbench_mcp_server.src.functions.list_model_deployments import list_model_deployments
+from cai_workbench_mcp_server.src.functions.list_models import list_models
+from cai_workbench_mcp_server.src.functions.list_project_files import list_project_files
+from cai_workbench_mcp_server.src.functions.log_experiment_run_batch import log_experiment_run_batch
+from cai_workbench_mcp_server.src.functions.restart_application import restart_application
+from cai_workbench_mcp_server.src.functions.stop_application import stop_application
+from cai_workbench_mcp_server.src.functions.stop_job_run import stop_job_run
+from cai_workbench_mcp_server.src.functions.stop_model_deployment import stop_model_deployment
+from cai_workbench_mcp_server.src.functions.update_application import update_application
+from cai_workbench_mcp_server.src.functions.update_experiment import update_experiment
+from cai_workbench_mcp_server.src.functions.update_experiment_run import update_experiment_run
+from cai_workbench_mcp_server.src.functions.update_job import update_job
+from cai_workbench_mcp_server.src.functions.update_project import update_project
+from cai_workbench_mcp_server.src.functions.update_project_file_metadata import update_project_file_metadata
+from cai_workbench_mcp_server.src.functions.upload_file import upload_file
 
 # upload_folder requires cmlapi (optional dependency)
 try:
-    from cml_mcp_server.src.functions.upload_folder import upload_folder
+    from cai_workbench_mcp_server.src.functions.upload_folder import upload_folder
     HAS_UPLOAD_FOLDER = True
 except ImportError:
     HAS_UPLOAD_FOLDER = False
@@ -168,11 +168,11 @@ def test_no_subprocess_vulnerabilities():
     Verify that NO functions use subprocess.run for API calls
     This is critical for security - prevents API key exposure in process list
     """
-    import cml_mcp_server.src.functions.delete_application as delete_app_mod
-    import cml_mcp_server.src.functions.create_job_run as create_job_run_mod
-    import cml_mcp_server.src.functions.get_job as get_job_mod
-    import cml_mcp_server.src.functions.list_experiments as list_exp_mod
-    import cml_mcp_server.src.functions.create_experiment_run as create_exp_run_mod
+    import cai_workbench_mcp_server.src.functions.delete_application as delete_app_mod
+    import cai_workbench_mcp_server.src.functions.create_job_run as create_job_run_mod
+    import cai_workbench_mcp_server.src.functions.get_job as get_job_mod
+    import cai_workbench_mcp_server.src.functions.list_experiments as list_exp_mod
+    import cai_workbench_mcp_server.src.functions.create_experiment_run as create_exp_run_mod
     
     critical_modules = [
         delete_app_mod,
@@ -394,56 +394,56 @@ def test_list_operations_return_consistent_structure(mock_config):
 
 def test_all_modules_import_successfully():
     """Verify all function modules can be imported"""
-    import cml_mcp_server.src.functions.batch_list_projects
-    import cml_mcp_server.src.functions.create_application
-    import cml_mcp_server.src.functions.create_experiment
-    import cml_mcp_server.src.functions.create_experiment_run
-    import cml_mcp_server.src.functions.create_job
-    import cml_mcp_server.src.functions.create_job_run
-    import cml_mcp_server.src.functions.create_model_build
-    import cml_mcp_server.src.functions.create_model_deployment
-    import cml_mcp_server.src.functions.delete_all_jobs
-    import cml_mcp_server.src.functions.delete_application
-    import cml_mcp_server.src.functions.delete_experiment
-    import cml_mcp_server.src.functions.delete_experiment_run
-    import cml_mcp_server.src.functions.delete_experiment_run_batch
-    import cml_mcp_server.src.functions.delete_job
-    import cml_mcp_server.src.functions.delete_model
-    import cml_mcp_server.src.functions.delete_project_file
-    import cml_mcp_server.src.functions.get_application
-    import cml_mcp_server.src.functions.get_experiment
-    import cml_mcp_server.src.functions.get_experiment_run
-    import cml_mcp_server.src.functions.get_job
-    import cml_mcp_server.src.functions.get_job_run
-    import cml_mcp_server.src.functions.get_model
-    import cml_mcp_server.src.functions.get_model_build
-    import cml_mcp_server.src.functions.get_model_deployment
-    import cml_mcp_server.src.functions.get_project_id
-    import cml_mcp_server.src.functions.get_runtimes
-    import cml_mcp_server.src.functions.list_applications
-    import cml_mcp_server.src.functions.list_experiments
-    import cml_mcp_server.src.functions.list_job_runs
-    import cml_mcp_server.src.functions.list_jobs
-    import cml_mcp_server.src.functions.list_model_builds
-    import cml_mcp_server.src.functions.list_model_deployments
-    import cml_mcp_server.src.functions.list_models
-    import cml_mcp_server.src.functions.list_project_files
-    import cml_mcp_server.src.functions.log_experiment_run_batch
-    import cml_mcp_server.src.functions.restart_application
-    import cml_mcp_server.src.functions.stop_application
-    import cml_mcp_server.src.functions.stop_job_run
-    import cml_mcp_server.src.functions.stop_model_deployment
-    import cml_mcp_server.src.functions.update_application
-    import cml_mcp_server.src.functions.update_experiment
-    import cml_mcp_server.src.functions.update_experiment_run
-    import cml_mcp_server.src.functions.update_job
-    import cml_mcp_server.src.functions.update_project
-    import cml_mcp_server.src.functions.update_project_file_metadata
-    import cml_mcp_server.src.functions.upload_file
+    import cai_workbench_mcp_server.src.functions.batch_list_projects
+    import cai_workbench_mcp_server.src.functions.create_application
+    import cai_workbench_mcp_server.src.functions.create_experiment
+    import cai_workbench_mcp_server.src.functions.create_experiment_run
+    import cai_workbench_mcp_server.src.functions.create_job
+    import cai_workbench_mcp_server.src.functions.create_job_run
+    import cai_workbench_mcp_server.src.functions.create_model_build
+    import cai_workbench_mcp_server.src.functions.create_model_deployment
+    import cai_workbench_mcp_server.src.functions.delete_all_jobs
+    import cai_workbench_mcp_server.src.functions.delete_application
+    import cai_workbench_mcp_server.src.functions.delete_experiment
+    import cai_workbench_mcp_server.src.functions.delete_experiment_run
+    import cai_workbench_mcp_server.src.functions.delete_experiment_run_batch
+    import cai_workbench_mcp_server.src.functions.delete_job
+    import cai_workbench_mcp_server.src.functions.delete_model
+    import cai_workbench_mcp_server.src.functions.delete_project_file
+    import cai_workbench_mcp_server.src.functions.get_application
+    import cai_workbench_mcp_server.src.functions.get_experiment
+    import cai_workbench_mcp_server.src.functions.get_experiment_run
+    import cai_workbench_mcp_server.src.functions.get_job
+    import cai_workbench_mcp_server.src.functions.get_job_run
+    import cai_workbench_mcp_server.src.functions.get_model
+    import cai_workbench_mcp_server.src.functions.get_model_build
+    import cai_workbench_mcp_server.src.functions.get_model_deployment
+    import cai_workbench_mcp_server.src.functions.get_project_id
+    import cai_workbench_mcp_server.src.functions.get_runtimes
+    import cai_workbench_mcp_server.src.functions.list_applications
+    import cai_workbench_mcp_server.src.functions.list_experiments
+    import cai_workbench_mcp_server.src.functions.list_job_runs
+    import cai_workbench_mcp_server.src.functions.list_jobs
+    import cai_workbench_mcp_server.src.functions.list_model_builds
+    import cai_workbench_mcp_server.src.functions.list_model_deployments
+    import cai_workbench_mcp_server.src.functions.list_models
+    import cai_workbench_mcp_server.src.functions.list_project_files
+    import cai_workbench_mcp_server.src.functions.log_experiment_run_batch
+    import cai_workbench_mcp_server.src.functions.restart_application
+    import cai_workbench_mcp_server.src.functions.stop_application
+    import cai_workbench_mcp_server.src.functions.stop_job_run
+    import cai_workbench_mcp_server.src.functions.stop_model_deployment
+    import cai_workbench_mcp_server.src.functions.update_application
+    import cai_workbench_mcp_server.src.functions.update_experiment
+    import cai_workbench_mcp_server.src.functions.update_experiment_run
+    import cai_workbench_mcp_server.src.functions.update_job
+    import cai_workbench_mcp_server.src.functions.update_project
+    import cai_workbench_mcp_server.src.functions.update_project_file_metadata
+    import cai_workbench_mcp_server.src.functions.upload_file
     
     # upload_folder requires cmlapi (optional), only import if available
     if HAS_UPLOAD_FOLDER:
-        import cml_mcp_server.src.functions.upload_folder
+        import cai_workbench_mcp_server.src.functions.upload_folder
     
     # If we got here, all imports succeeded
     assert True

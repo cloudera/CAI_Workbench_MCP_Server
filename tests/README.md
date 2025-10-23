@@ -1,6 +1,6 @@
-# CML MCP Server Test Suite
+# CAI Workbench MCP Server Test Suite
 
-Comprehensive test suite for all CML MCP Server functions, suitable for CI/CD pipelines.
+Comprehensive test suite for all CAI Workbench MCP Server functions, suitable for CI/CD pipelines.
 
 ## Test Files
 
@@ -8,7 +8,7 @@ Comprehensive test suite for all CML MCP Server functions, suitable for CI/CD pi
 
 **Main test suite covering all 47+ functions in the repository** - CI/CD Ready
 
-### `test_cml_mcp_client.py` - FastMCP Integration Test Suite ⭐
+### `test_cai_mcp_client.py` - FastMCP Integration Test Suite ⭐
 
 **End-to-end integration tests using FastMCP client** - Tests actual MCP protocol
 
@@ -75,13 +75,13 @@ uv run pytest tests/test_all_functions.py -v
 uv run pytest tests/ -v
 ```
 
-### Option 2: FastMCP Integration Tests (test_cml_mcp_client.py)
+### Option 2: FastMCP Integration Tests (test_cai_mcp_client.py)
 ```bash
 # Run full integration test suite
-uv run python tests/test_cml_mcp_client.py
+uv run python tests/test_cai_mcp_client.py
 
 # Run quick smoke test (faster)
-uv run python tests/test_cml_mcp_client.py --quick
+uv run python tests/test_cai_mcp_client.py --quick
 ```
 
 ### Quick Test
@@ -96,7 +96,7 @@ uv run pytest tests/test_all_functions.py::test_create_job_with_parameters -v
 ### CI/CD Integration
 ```bash
 # Run with coverage (add pytest-cov to dev dependencies)
-uv run pytest tests/ --cov=cml_mcp_server --cov-report=term-missing
+uv run pytest tests/ --cov=cai_workbench_mcp_server --cov-report=term-missing
 
 # Run with JUnit XML output for CI systems
 uv run pytest tests/ --junit-xml=test-results.xml
@@ -151,9 +151,9 @@ This is **expected** and validates that:
 ### With Valid Credentials
 Set these environment variables for full functional testing:
 ```bash
-export CLOUDERA_ML_HOST="https://your-cml-instance.cloudera.site"
-export CLOUDERA_ML_API_KEY="your-api-key"
-export CLOUDERA_ML_PROJECT_ID="your-project-id"
+export CAI_WORKBENCH_HOST="https://your-cai-instance.cloudera.site"
+export CAI_WORKBENCH_API_KEY="your-api-key"
+export CAI_WORKBENCH_PROJECT_ID="your-project-id"
 ```
 
 ## Test Requirements
