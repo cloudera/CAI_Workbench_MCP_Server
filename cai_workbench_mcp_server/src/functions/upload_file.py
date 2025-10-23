@@ -11,7 +11,7 @@ def upload_file_to_root(host, api_key, project_id, file_path, target_name=None, 
     Upload a file to the project using direct PUT request
     
     Args:
-        host: CML host URL
+        host: CAI host URL
         api_key: API key for authentication
         project_id: ID of the project to upload to
         file_path: Full path to the file to upload

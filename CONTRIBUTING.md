@@ -110,7 +110,7 @@ uv run pytest tests/ -v
 uv run pytest tests/test_all_functions.py::test_no_subprocess_vulnerabilities -v
 
 # FastMCP test
-uv run python tests/test_cml_mcp_client.py --quick
+uv run python tests/test_cai_mcp_client.py --quick
 ```
 
 ### Add Tests
