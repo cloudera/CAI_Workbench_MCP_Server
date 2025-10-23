@@ -1,5 +1,5 @@
 """
-Create a new model deployment in Cloudera ML
+Create a new model deployment in Cloudera AI
 """
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def create_model_deployment(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create a new model deployment in Cloudera ML
+    Create a new model deployment in Cloudera AI
     
     Args:
         config: MCP configuration with host and api_key

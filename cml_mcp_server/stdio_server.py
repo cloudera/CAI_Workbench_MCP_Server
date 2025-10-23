@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Cloudera ML MCP STDIO Server - Clean STDIO-only implementation
+Cloudera AI Workbench MCP STDIO Server - Clean STDIO-only implementation
 
-This server enables LLMs to interact with Cloudera Machine Learning via API.
+This server enables LLMs to interact with Cloudera AI via API.
 Uses STDIO transport for secure subprocess communication (recommended for Claude Desktop).
 """
 
@@ -143,7 +143,7 @@ mcp = FastMCP("cloudera-ml")
 @mcp.tool()
 def upload_folder_tool(folder_path: str, ignore_folders: str = None, project_id: str = None) -> str:
     """
-    Upload a folder to Cloudera ML.
+    Upload a folder to Cloudera AI.
     
     Args:
         folder_path: Local path to the folder to upload
@@ -169,7 +169,7 @@ def upload_folder_tool(folder_path: str, ignore_folders: str = None, project_id:
 @mcp.tool()
 def upload_file_tool(file_path: str, target_name: str = None, target_dir: str = None, project_id: str = None) -> str:
     """
-    Upload a single file to Cloudera ML.
+    Upload a single file to Cloudera AI.
     
     Args:
         file_path: Local path to the file to upload
@@ -194,7 +194,7 @@ def upload_file_tool(file_path: str, target_name: str = None, target_dir: str = 
 @mcp.tool()
 def list_project_files_tool(project_id: str, path: str = "") -> str:
     """
-    List files in a Cloudera ML project.
+    List files in a Cloudera AI project.
     
     Args:
         project_id: ID of the project
@@ -216,7 +216,7 @@ def list_project_files_tool(project_id: str, path: str = "") -> str:
 @mcp.tool()
 def delete_project_file_tool(file_path: str, project_id: str = None) -> str:
     """
-    Delete a file or directory from a Cloudera ML project.
+    Delete a file or directory from a Cloudera AI project.
     
     Args:
         file_path: Path of the file or directory to delete (relative to project root)
@@ -241,7 +241,7 @@ def delete_project_file_tool(file_path: str, project_id: str = None) -> str:
 def update_project_file_metadata_tool(file_path: str, description: str = None,
                                      hidden: bool = None, project_id: str = None) -> str:
     """
-    Update metadata of a file in a Cloudera ML project.
+    Update metadata of a file in a Cloudera AI project.
     
     Args:
         file_path: Path of the file relative to the project root
@@ -278,7 +278,7 @@ def create_job_tool(name: str, script: str, kernel: str = "python3",
                    cpu: int = 1, memory: int = 1, nvidia_gpu: int = 0,
                    runtime_identifier: str = None, project_id: str = None) -> str:
     """
-    Create a new Cloudera ML job.
+    Create a new Cloudera AI job.
     
     Args:
         name: Job name
@@ -311,7 +311,7 @@ def create_job_tool(name: str, script: str, kernel: str = "python3",
 @mcp.tool()
 def list_jobs_tool(project_id: str = None) -> str:
     """
-    List all jobs in the Cloudera ML project.
+    List all jobs in the Cloudera AI project.
     
     Args:
         project_id: Project ID (optional - if not provided, uses default from configuration)
@@ -329,7 +329,7 @@ def list_jobs_tool(project_id: str = None) -> str:
 @mcp.tool()
 def get_job_tool(job_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific job from a Cloudera ML project.
+    Get details of a specific job from a Cloudera AI project.
     
     Args:
         job_id: ID of the job to retrieve
@@ -356,7 +356,7 @@ def update_job_tool(job_id: str, name: str = None, script: str = None,
                    nvidia_gpu: int = None, runtime_identifier: str = None,
                    environment_variables: str = None, project_id: str = None) -> str:
     """
-    Update an existing job in Cloudera ML.
+    Update an existing job in Cloudera AI.
     
     Args:
         job_id: ID of the job to update
@@ -452,7 +452,7 @@ def create_job_run_tool(project_id: str, job_id: str,
                        environment_variables: str = None,
                        override_config: str = None) -> str:
     """
-    Create a run for an existing job in Cloudera ML.
+    Create a run for an existing job in Cloudera AI.
     
     Args:
         project_id: ID of the project containing the job
@@ -500,7 +500,7 @@ def create_job_run_tool(project_id: str, job_id: str,
 @mcp.tool()
 def list_job_runs_tool(job_id: str = None, project_id: str = None) -> str:
     """
-    List all job runs in the Cloudera ML project.
+    List all job runs in the Cloudera AI project.
     
     Args:
         job_id: If provided, only list runs for this specific job
@@ -523,7 +523,7 @@ def list_job_runs_tool(job_id: str = None, project_id: str = None) -> str:
 @mcp.tool()
 def get_job_run_tool(job_id: str, run_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific job run from a Cloudera ML project.
+    Get details of a specific job run from a Cloudera AI project.
     
     Args:
         job_id: ID of the job containing the run
@@ -549,7 +549,7 @@ def get_job_run_tool(job_id: str, run_id: str, project_id: str = None) -> str:
 @mcp.tool()
 def stop_job_run_tool(job_id: str, run_id: str, project_id: str = None) -> str:
     """
-    Stop a running job run in Cloudera ML.
+    Stop a running job run in Cloudera AI.
     
     Args:
         job_id: ID of the job
@@ -605,7 +605,7 @@ def update_project_tool(name: str = None, summary: str = None, template: str = N
                        public: bool = None, disable_git_repo: bool = None, 
                        project_id: str = None) -> str:
     """
-    Update a project in Cloudera ML.
+    Update a project in Cloudera AI.
     
     Args:
         name: New name for the project (optional)
@@ -649,7 +649,7 @@ def update_project_tool(name: str = None, summary: str = None, template: str = N
 @mcp.tool()
 def get_runtimes_tool() -> str:
     """
-    Get available runtimes from Cloudera ML.
+    Get available runtimes from Cloudera AI.
     
     Returns:
         JSON string with list of available runtimes and their details
@@ -662,7 +662,7 @@ def get_runtimes_tool() -> str:
 @mcp.tool()
 def create_experiment_tool(project_id: str, name: str, description: str = None) -> str:
     """
-    Create a new experiment in Cloudera ML.
+    Create a new experiment in Cloudera AI.
     
     Args:
         project_id: ID of the project
@@ -688,7 +688,7 @@ def create_experiment_tool(project_id: str, name: str, description: str = None) 
 @mcp.tool()
 def list_experiments_tool(project_id: str = None) -> str:
     """
-    List all experiments in the Cloudera ML project.
+    List all experiments in the Cloudera AI project.
     
     Args:
         project_id: Project ID (optional - if not provided, uses default from configuration)
@@ -706,7 +706,7 @@ def list_experiments_tool(project_id: str = None) -> str:
 @mcp.tool()
 def get_experiment_tool(experiment_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific experiment from a Cloudera ML project.
+    Get details of a specific experiment from a Cloudera AI project.
     
     Args:
         experiment_id: ID of the experiment to retrieve
@@ -731,7 +731,7 @@ def get_experiment_tool(experiment_id: str, project_id: str = None) -> str:
 def update_experiment_tool(experiment_id: str, name: str = None, 
                           description: str = None, project_id: str = None) -> str:
     """
-    Update an existing experiment in Cloudera ML.
+    Update an existing experiment in Cloudera AI.
     
     Args:
         experiment_id: ID of the experiment to update
@@ -763,7 +763,7 @@ def update_experiment_tool(experiment_id: str, name: str = None,
 @mcp.tool()
 def delete_experiment_tool(experiment_id: str, project_id: str = None) -> str:
     """
-    Delete an experiment in Cloudera ML.
+    Delete an experiment in Cloudera AI.
     
     Args:
         experiment_id: ID of the experiment to delete
@@ -789,7 +789,7 @@ def create_experiment_run_tool(project_id: str, experiment_id: str, name: str = 
                               description: str = None, metrics: str = None,
                               parameters: str = None, tags: str = None) -> str:
     """
-    Create a new experiment run in Cloudera ML.
+    Create a new experiment run in Cloudera AI.
     
     Args:
         project_id: ID of the project
@@ -846,7 +846,7 @@ def create_experiment_run_tool(project_id: str, experiment_id: str, name: str = 
 @mcp.tool()
 def get_experiment_run_tool(experiment_id: str, run_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific experiment run from a Cloudera ML project.
+    Get details of a specific experiment run from a Cloudera AI project.
     
     Args:
         experiment_id: ID of the experiment containing the run
@@ -875,7 +875,7 @@ def update_experiment_run_tool(experiment_id: str, run_id: str,
                               metrics: str = None, parameters: str = None,
                               tags: str = None, project_id: str = None) -> str:
     """
-    Update an existing experiment run in Cloudera ML.
+    Update an existing experiment run in Cloudera AI.
     
     Args:
         experiment_id: ID of the experiment containing the run
@@ -935,7 +935,7 @@ def update_experiment_run_tool(experiment_id: str, run_id: str,
 @mcp.tool()
 def delete_experiment_run_tool(experiment_id: str, run_id: str, project_id: str = None) -> str:
     """
-    Delete an experiment run in Cloudera ML.
+    Delete an experiment run in Cloudera AI.
     
     Args:
         experiment_id: ID of the experiment containing the run
@@ -1030,7 +1030,7 @@ def log_experiment_run_batch_tool(experiment_id: str, run_updates: str, project_
 @mcp.tool()
 def list_models_tool(project_id: str = None) -> str:
     """
-    List all models in the Cloudera ML project.
+    List all models in the Cloudera AI project.
     
     Args:
         project_id: Project ID (optional - if not provided, uses default from configuration)
@@ -1048,7 +1048,7 @@ def list_models_tool(project_id: str = None) -> str:
 @mcp.tool()
 def get_model_tool(model_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific model from a Cloudera ML project.
+    Get details of a specific model from a Cloudera AI project.
     
     Args:
         model_id: ID of the model to retrieve
@@ -1072,7 +1072,7 @@ def get_model_tool(model_id: str, project_id: str = None) -> str:
 @mcp.tool()
 def delete_model_tool(model_id: str, project_id: str = None) -> str:
     """
-    Delete a model in Cloudera ML.
+    Delete a model in Cloudera AI.
     
     Args:
         model_id: ID of the model to delete
@@ -1100,7 +1100,7 @@ def create_model_build_tool(project_id: str, model_id: str, file_path: str, func
                            nvidia_gpu: int = 0, use_custom_docker_image: bool = False,
                            custom_docker_image: str = None, environment_variables: str = None) -> str:
     """
-    Create a new model build in Cloudera ML.
+    Create a new model build in Cloudera AI.
     
     Args:
         project_id: ID of the project
@@ -1160,7 +1160,7 @@ def create_model_build_tool(project_id: str, model_id: str, file_path: str, func
 @mcp.tool()
 def list_model_builds_tool(model_id: str = None, project_id: str = None) -> str:
     """
-    List all model builds in the Cloudera ML project.
+    List all model builds in the Cloudera AI project.
     
     Args:
         model_id: If provided, only list builds for this specific model
@@ -1183,7 +1183,7 @@ def list_model_builds_tool(model_id: str = None, project_id: str = None) -> str:
 @mcp.tool()
 def get_model_build_tool(model_id: str, build_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific model build from a Cloudera ML project.
+    Get details of a specific model build from a Cloudera AI project.
     
     Args:
         model_id: ID of the model that contains the build
@@ -1213,7 +1213,7 @@ def create_model_deployment_tool(project_id: str, model_id: str, build_id: str, 
                                 nvidia_gpu: int = 0, enable_auth: bool = True,
                                 target_node_selector: str = None, environment_variables: str = None) -> str:
     """
-    Create a new model deployment in Cloudera ML.
+    Create a new model deployment in Cloudera AI.
     
     Args:
         project_id: ID of the project
@@ -1273,7 +1273,7 @@ def create_model_deployment_tool(project_id: str, model_id: str, build_id: str, 
 @mcp.tool()
 def list_model_deployments_tool(model_id: str = None, build_id: str = None, project_id: str = None) -> str:
     """
-    List all model deployments in the Cloudera ML project.
+    List all model deployments in the Cloudera AI project.
     
     Args:
         model_id: If provided, only list deployments for this specific model
@@ -1299,7 +1299,7 @@ def list_model_deployments_tool(model_id: str = None, build_id: str = None, proj
 @mcp.tool()
 def get_model_deployment_tool(model_id: str, deployment_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific model deployment from a Cloudera ML project.
+    Get details of a specific model deployment from a Cloudera AI project.
     
     Args:
         model_id: ID of the model that contains the deployment
@@ -1325,7 +1325,7 @@ def get_model_deployment_tool(model_id: str, deployment_id: str, project_id: str
 @mcp.tool()
 def stop_model_deployment_tool(model_id: str, deployment_id: str, project_id: str = None) -> str:
     """
-    Stop a model deployment in Cloudera ML.
+    Stop a model deployment in Cloudera AI.
     
     Args:
         model_id: ID of the model
@@ -1356,7 +1356,7 @@ def create_application_tool(project_id: str, name: str, subdomain: str,
                            runtime_identifier: str = None, 
                            environment_variables: str = None) -> str:
     """
-    Create a new application in Cloudera ML.
+    Create a new application in Cloudera AI.
     
     Args:
         project_id: ID of the project
@@ -1406,7 +1406,7 @@ def create_application_tool(project_id: str, name: str, subdomain: str,
 @mcp.tool()
 def list_applications_tool(project_id: str = None) -> str:
     """
-    List all applications in the Cloudera ML project.
+    List all applications in the Cloudera AI project.
     
     Args:
         project_id: Project ID (optional - if not provided, uses default from configuration)
@@ -1424,7 +1424,7 @@ def list_applications_tool(project_id: str = None) -> str:
 @mcp.tool()
 def get_application_tool(application_id: str, project_id: str = None) -> str:
     """
-    Get details of a specific application from a Cloudera ML project.
+    Get details of a specific application from a Cloudera AI project.
     
     Args:
         application_id: ID of the application to get details for
@@ -1453,7 +1453,7 @@ def update_application_tool(application_id: str, name: str = None,
                            environment_variables: str = None, 
                            project_id: str = None) -> str:
     """
-    Update an existing application in Cloudera ML.
+    Update an existing application in Cloudera AI.
     
     Args:
         application_id: ID of the application to update
@@ -1515,7 +1515,7 @@ def update_application_tool(application_id: str, name: str = None,
 @mcp.tool()
 def restart_application_tool(application_id: str, project_id: str = None) -> str:
     """
-    Restart a running application in a Cloudera ML project.
+    Restart a running application in a Cloudera AI project.
     
     Args:
         application_id: ID of the application to restart
@@ -1539,7 +1539,7 @@ def restart_application_tool(application_id: str, project_id: str = None) -> str
 @mcp.tool()
 def stop_application_tool(application_id: str, project_id: str = None) -> str:
     """
-    Stop a running application in Cloudera ML.
+    Stop a running application in Cloudera AI.
     
     Args:
         application_id: ID of the application to stop
@@ -1563,7 +1563,7 @@ def stop_application_tool(application_id: str, project_id: str = None) -> str:
 @mcp.tool()
 def delete_application_tool(application_id: str, project_id: str = None) -> str:
     """
-    Delete an application in Cloudera ML.
+    Delete an application in Cloudera AI.
     
     Args:
         application_id: ID of the application to delete
@@ -1586,7 +1586,7 @@ def delete_application_tool(application_id: str, project_id: str = None) -> str:
 
 
 def main():
-    """Main entry point for the Cloudera ML MCP STDIO server."""
+    """Main entry point for the Cloudera AI Workbench MCP STDIO server."""
     # Check required configuration
     config = get_config()
     required_config = ["host", "api_key"]
@@ -1602,7 +1602,7 @@ def main():
         exit(1)
     
     # For STDIO, only log to stderr
-    print(f"Starting Cloudera ML MCP Server (STDIO mode)...", file=sys.stderr)
+    print(f"Starting Cloudera AI Workbench MCP Server (STDIO mode)...", file=sys.stderr)
     print(f"Connected to: {config['host']}", file=sys.stderr)
     print("47 tools available", file=sys.stderr)
     print("🔒 Secure Transport: Using environment variables for authentication", file=sys.stderr)

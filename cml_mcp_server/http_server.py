@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cloudera ML MCP HTTP Server - Simplified HTTP-only implementation
+Cloudera AI Workbench MCP HTTP Server - Simplified HTTP-only implementation
 """
 
 import os
@@ -204,17 +204,17 @@ async def mcp_protocol_endpoint(request):
         elif method == "tools/list":
             # Just return the 6 main tools that were working before
             tools = [
-                {"name": "list_jobs_tool", "description": "List all jobs in the Cloudera ML project", 
+                {"name": "list_jobs_tool", "description": "List all jobs in the Cloudera AI project", 
                  "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
                 {"name": "list_projects_tool", "description": "List all available projects",
                  "inputSchema": {"type": "object", "properties": {}, "required": []}},
-                {"name": "get_runtimes_tool", "description": "Get available runtimes from Cloudera ML",
+                {"name": "get_runtimes_tool", "description": "Get available runtimes from Cloudera AI",
                  "inputSchema": {"type": "object", "properties": {}, "required": []}},
-                {"name": "list_applications_tool", "description": "List all applications in the Cloudera ML project",
+                {"name": "list_applications_tool", "description": "List all applications in the Cloudera AI project",
                  "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-                {"name": "list_experiments_tool", "description": "List all experiments in the Cloudera ML project",
+                {"name": "list_experiments_tool", "description": "List all experiments in the Cloudera AI project",
                  "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-                {"name": "list_models_tool", "description": "List all models in the Cloudera ML project",
+                {"name": "list_models_tool", "description": "List all models in the Cloudera AI project",
                  "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
             ]
             return JSONResponse({"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools}})
@@ -268,7 +268,7 @@ async def test_endpoint(request):
     from starlette.responses import JSONResponse
     return JSONResponse({
         "status": "ok",
-        "message": "Cloudera ML HTTP Server is running",
+        "message": "Cloudera AI HTTP Server is running",
         "transport": "http",
         "endpoint": "/mcp-api",
         "tools_available": len(TOOL_IMPLEMENTATIONS)
@@ -352,7 +352,7 @@ def main():
     host = os.getenv("CML_MCP_HOST", "0.0.0.0")
     port = int(os.getenv("CML_MCP_PORT", "8000"))
     
-    print("Starting Cloudera ML HTTP Server...")
+    print("Starting Cloudera AI HTTP Server...")
     print(f"Connected to: {config['host']}")
     print(f"Tools available: {len(TOOL_IMPLEMENTATIONS)}")
     print(f"Server will start on {host}:{port}")

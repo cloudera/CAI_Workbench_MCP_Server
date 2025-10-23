@@ -3,7 +3,7 @@
 Test CML MCP Server using FastMCP Client
 Simple, clean approach - testing representative tools from each category
 
-Note: These tests use mock project IDs. For real testing with actual Cloudera ML:
+Note: These tests use mock project IDs. For real testing with actual Cloudera AI:
 - Set environment variables: CLOUDERA_ML_HOST, CLOUDERA_ML_API_KEY, CLOUDERA_ML_PROJECT_ID
 - Use real project IDs in format: xxxx-xxxx-xxxx-xxxx (e.g., "9er0-ooi9-uopm-8i8o")
 """

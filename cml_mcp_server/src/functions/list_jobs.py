@@ -1,4 +1,4 @@
-"""List jobs function for Cloudera ML MCP"""
+"""List jobs function for Cloudera AI Workbench MCP"""
 
 import requests
 from typing import Dict, Any
@@ -7,7 +7,7 @@ from datetime import datetime
 
 def list_jobs(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    List jobs in the Cloudera ML project
+    List jobs in the Cloudera AI project
     
     Args:
         config: MCP configuration

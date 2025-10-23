@@ -3,14 +3,14 @@
 ## Prerequisites
 
 - Docker installed and running
-- Access to your Cloudera ML instance
+- Access to your Cloudera AI instance
 
 ## Quick Start
 
 ### 1. Set Environment Variable
 
 ```bash
-# Set your Cloudera ML host
+# Set your Cloudera AI host
 export CLOUDERA_ML_HOST=https://your-cml-instance.cloudera.site
 ```
 

@@ -1,16 +1,16 @@
-# Cloudera ML MCP Server
+# Cloudera AI Workbench MCP Server
 
-A Model Context Protocol (MCP) server for Cloudera Machine Learning built with FastMCP, enabling LLMs to interact with Cloudera ML APIs.
+A Model Context Protocol (MCP) server for Cloudera AI workbench built with FastMCP, enabling LLMs to interact with Cloudera AI Workbench APIs.
 
 ## Features
 
-### Cloudera ML Integration
+### Cloudera AI Integration
 - **File Management**: Upload files and folders with directory structure preservation
-- **Job Management**: Create, run, monitor, and delete CML jobs
+- **Job Management**: Create, run, monitor, and delete jobs
 - **Model Lifecycle**: Build, deploy, and manage ML models
 - **Experiment Tracking**: Log metrics, parameters, and manage experiment runs
 - **Project Operations**: Project discovery, file listing, and metadata management
-- **Application Management**: Create, update, and manage CML applications
+- **Application Management**: Create, update, and manage applications
 
 ### Transport Modes
 1. **STDIO** (Recommended): Secure subprocess communication for local/Claude Desktop use
@@ -18,27 +18,55 @@ A Model Context Protocol (MCP) server for Cloudera Machine Learning built with F
 
 ## Prerequisites
 - Python 3.10 or higher
-- Access to a Cloudera Machine Learning instance  
-- Valid Cloudera ML API key
+- Access to a Cloudera AI instance  
+- Valid Cloudera AI API key
 - `uv` package manager (for local development)
 
 ## Quick Start
 
-### Option 1: Running in Cloudera ML Environment
+### Option 1: Cloudera AI Environment(Agent Studio)
 
-If you're running inside a Cloudera ML workspace/session:
+The easiest way to use this MCP server is through [Cloudera Agent Studio](https://docs.cloudera.com/ai-assistant/), which provides a managed environment for AI agents.
 
-```bash
-# Install and run with STDIO (recommended)
-uvx --from git+https://github.com/cloudera/CML_MCP_Server.git cml-mcp-stdio
+#### Setup 
 
-# Or for HTTP server (development only)
-uvx --from git+https://github.com/cloudera/CML_MCP_Server.git cml-mcp-http
+1. **Navigate to Agent Studio** in your Cloudera AI workspace
+2. **Create a new agent** or edit an existing one
+3. **Add MCP Server** in the configuration:
+
+```json
+{
+  "mcpServers": {
+    "cloudera-ai": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/cloudera/CML_MCP_Server.git",
+        "cml-mcp-stdio"
+      ],
+      "env": {
+        "CLOUDERA_ML_HOST": "${CLOUDERA_ML_HOST}",
+        "CLOUDERA_ML_API_KEY": "${CLOUDERA_ML_API_KEY}",
+        "CLOUDERA_ML_PROJECT_ID": "${CLOUDERA_ML_PROJECT_ID}"
+      }
+    }
+  }
+}
 ```
 
-### Option 2: Docker (Recommended)
+4. **Set environment variables** in Agent Studio settings:
+   - `CLOUDERA_ML_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
+   - `CLOUDERA_ML_API_KEY`: Your API key from Cloudera AI
+   - `CLOUDERA_ML_PROJECT_ID`: Your default project ID (optional)
 
-Configure your CML domain first - see [SETUP.md](./SETUP.md).
+5. **Save and test** - Your agent now has access to all 47 Cloudera AI tools!
+
+
+
+
+### Option 2: Docker
+
+Configure your Cloudera AI domain first - see [SETUP.md](./SETUP.md).
 
 ```bash
 # Clone repository
@@ -54,7 +82,7 @@ make run
 
 See [DOCKER.md](./DOCKER.md) for Docker documentation.
 
-### Option 3: Local Development
+### Option 4: Local Development
 
 #### 1. Clone and setup
 ```bash
@@ -63,12 +91,12 @@ cd cml_mcp_server
 uv sync
 ```
 
-#### 2. Install Cloudera ML API Client
+#### 2. Install Cloudera AI API Client
 ```bash
-# Set your Cloudera ML domain
+# Set your Cloudera AI domain
 export CDSW_DOMAIN="ml-xxxx.cloudera.site"  # Replace with your actual domain
 
-# Install cmlapi from your Cloudera ML instance
+# Install cmlapi from your Cloudera AI instance
 uv pip install https://$CDSW_DOMAIN/api/v2/python.tar.gz
 ```
 
@@ -306,7 +334,7 @@ create_model_deployment_tool(
 ## Troubleshooting
 
 1. **"Missing required configuration"**: Set CLOUDERA_ML_HOST and CLOUDERA_ML_API_KEY
-2. **"cmlapi not found"**: Install from your Cloudera ML instance
+2. **"cmlapi not found"**: Install from your Cloudera AI instance
 3. **HTTP connection issues**: Ensure server is running on correct port
 4. **Tool not found**: Check tool name spelling (use `list_tools`)
 
@@ -318,8 +346,8 @@ create_model_deployment_tool(
 
 ## Related Resources
 
+- [Cloudera AI Workbench](https://docs.cloudera.com/ai-assistant/) - Cloudera AI documentation
 - [FastMCP](https://gofastmcp.com/) - The MCP framework
-- [Cloudera Machine Learning](https://docs.cloudera.com/machine-learning/) - CML documentation
 - [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
 
 ---

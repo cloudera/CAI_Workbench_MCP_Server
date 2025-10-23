@@ -1,4 +1,4 @@
-"""Create application function for Cloudera ML MCP"""
+"""Create application function for Cloudera AI Workbench MCP"""
 
 import requests
 import json
@@ -7,7 +7,7 @@ from typing import Dict, Any
 
 def create_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create a new application in a Cloudera ML project
+    Create a new application in a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

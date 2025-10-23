@@ -1,4 +1,4 @@
-"""Function to list model deployments in a Cloudera ML project."""
+"""Function to list model deployments in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def list_model_deployments(config, params=None):
     """
-    List model deployments in a Cloudera ML project.
+    List model deployments in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

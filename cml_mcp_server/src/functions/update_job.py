@@ -1,4 +1,4 @@
-"""Function to update a job in a Cloudera ML project."""
+"""Function to update a job in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def update_job(config, params=None):
     """
-    Update a job in a Cloudera ML project.
+    Update a job in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

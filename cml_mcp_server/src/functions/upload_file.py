@@ -1,4 +1,4 @@
-"""Upload file function for Cloudera ML MCP"""
+"""Upload file function for Cloudera AI Workbench MCP"""
 
 import os
 import time
@@ -71,7 +71,7 @@ def upload_file_to_root(host, api_key, project_id, file_path, target_name=None, 
 
 def upload_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Upload a single file to Cloudera ML
+    Upload a single file to Cloudera AI
     
     Args:
         config: MCP configuration

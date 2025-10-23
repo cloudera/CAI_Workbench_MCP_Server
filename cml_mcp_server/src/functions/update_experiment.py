@@ -1,4 +1,4 @@
-"""Function to update an experiment in a Cloudera ML project.
+"""Function to update an experiment in a Cloudera AI project.
 
 SECURITY BEST PRACTICES DEMONSTRATION:
 - Shows INCORRECT curl subprocess approach (commented out)
@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 def update_experiment(config, params=None):
     """
-    Update an experiment in a Cloudera ML project.
+    Update an experiment in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

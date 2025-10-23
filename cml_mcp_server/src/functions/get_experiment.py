@@ -1,4 +1,4 @@
-"""Get experiment function for Cloudera ML MCP
+"""Get experiment function for Cloudera AI Workbench MCP
 
 SECURITY BEST PRACTICES DEMONSTRATION:
 - Shows INCORRECT curl subprocess approach (commented out)  
@@ -16,7 +16,7 @@ from typing import Dict, Any
 
 def get_experiment(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get details of a specific experiment from a Cloudera ML project
+    Get details of a specific experiment from a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

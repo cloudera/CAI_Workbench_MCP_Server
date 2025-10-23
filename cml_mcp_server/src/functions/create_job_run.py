@@ -1,5 +1,5 @@
 """
-Create a run for an existing job in Cloudera ML
+Create a run for an existing job in Cloudera AI
 """
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def create_job_run(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create a run for an existing job in Cloudera ML
+    Create a run for an existing job in Cloudera AI
     
     Args:
         config: MCP configuration with host and api_key

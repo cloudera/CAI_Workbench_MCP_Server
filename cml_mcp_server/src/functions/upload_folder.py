@@ -1,4 +1,4 @@
-"""Upload folder function for Cloudera ML MCP"""
+"""Upload folder function for Cloudera AI Workbench MCP"""
 
 import os
 import json
@@ -26,7 +26,7 @@ def setup_client(host, api_key):
     except ImportError:
         raise ImportError(
             "cmlapi is required for upload_folder. "
-            "Install it from your Cloudera ML instance as described in the README."
+            "Install it from your Cloudera AI instance as described in the README."
         )
     # Properly format the host URL
     host = host.strip()
@@ -67,7 +67,7 @@ def delete_file_if_exists(client, project_id, file_path):
 
 def upload_file_to_project(host, api_key, project_id, file_path, relative_path):
     """
-    Upload a single file to Cloudera ML using direct PUT request
+    Upload a single file to Cloudera AI using direct PUT request
     
     Args:
         host: CML host URL
@@ -120,7 +120,7 @@ def upload_file_to_project(host, api_key, project_id, file_path, relative_path):
 
 def upload_folder(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Upload a folder to Cloudera ML using direct PUT request
+    Upload a folder to Cloudera AI using direct PUT request
     
     Args:
         config: MCP configuration

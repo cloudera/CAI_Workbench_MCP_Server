@@ -1,4 +1,4 @@
-"""Function to list files in a Cloudera ML project."""
+"""Function to list files in a Cloudera AI project."""
 
 import json
 import requests
@@ -7,7 +7,7 @@ from urllib.parse import urlparse, quote
 
 def list_project_files(config, params):
     """
-    List files in a Cloudera ML project.
+    List files in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

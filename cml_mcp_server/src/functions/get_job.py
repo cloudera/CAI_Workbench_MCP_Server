@@ -1,4 +1,4 @@
-"""Get job function for Cloudera ML MCP"""
+"""Get job function for Cloudera AI Workbench MCP"""
 
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def get_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get details of a specific job from a Cloudera ML project
+    Get details of a specific job from a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

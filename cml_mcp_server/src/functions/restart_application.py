@@ -1,4 +1,4 @@
-"""Function to restart a running application in a Cloudera ML project."""
+"""Function to restart a running application in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def restart_application(config, params=None):
     """
-    Restart a running application in a Cloudera ML project.
+    Restart a running application in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

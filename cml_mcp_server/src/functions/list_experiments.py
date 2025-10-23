@@ -1,4 +1,4 @@
-"""Function to list experiments in a Cloudera ML project."""
+"""Function to list experiments in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def list_experiments(config, params=None):
     """
-    List experiments in a Cloudera ML project.
+    List experiments in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

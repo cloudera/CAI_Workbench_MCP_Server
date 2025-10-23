@@ -1,4 +1,4 @@
-"""Get experiment run function for Cloudera ML MCP"""
+"""Get experiment run function for Cloudera AI Workbench MCP"""
 
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def get_experiment_run(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get details of a specific experiment run from a Cloudera ML project
+    Get details of a specific experiment run from a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial public release
 - Apache 2.0 license
 - NOTICE.txt with third-party attributions
-- 47+ MCP tools for Cloudera ML operations
+- 47+ MCP tools for Cloudera AI operations
 - Support for:
   - Project management
   - Job creation and management

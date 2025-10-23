@@ -1,4 +1,4 @@
-"""Function to update metadata of a file in a Cloudera ML project."""
+"""Function to update metadata of a file in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse, quote
 
 def update_project_file_metadata(config, params=None):
     """
-    Update metadata of a file in a Cloudera ML project.
+    Update metadata of a file in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

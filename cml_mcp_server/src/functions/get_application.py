@@ -1,4 +1,4 @@
-"""Get application function for Cloudera ML MCP"""
+"""Get application function for Cloudera AI Workbench MCP"""
 
 import requests
 from typing import Dict, Any
@@ -6,7 +6,7 @@ from typing import Dict, Any
 
 def get_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get details of a specific application from a Cloudera ML project
+    Get details of a specific application from a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

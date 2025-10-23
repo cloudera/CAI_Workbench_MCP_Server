@@ -1,5 +1,5 @@
 """
-Delete multiple experiment runs in Cloudera ML
+Delete multiple experiment runs in Cloudera AI
 """
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any, List
 
 def delete_experiment_run_batch(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete multiple experiment runs in Cloudera ML
+    Delete multiple experiment runs in Cloudera AI
     
     Args:
         config: MCP configuration with host and api_key

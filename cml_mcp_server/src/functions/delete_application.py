@@ -1,5 +1,5 @@
 """
-Delete an application in Cloudera ML
+Delete an application in Cloudera AI
 """
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def delete_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete an application in Cloudera ML
+    Delete an application in Cloudera AI
     
     Args:
         config: MCP configuration with host and api_key

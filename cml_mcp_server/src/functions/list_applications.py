@@ -1,4 +1,4 @@
-"""List applications function for Cloudera ML MCP"""
+"""List applications function for Cloudera AI Workbench MCP"""
 
 import requests
 from typing import Dict, Any
@@ -6,7 +6,7 @@ from typing import Dict, Any
 
 def list_applications(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    List applications in a Cloudera ML project
+    List applications in a Cloudera AI project
     
     Args:
         config (dict): MCP configuration containing host and api_key

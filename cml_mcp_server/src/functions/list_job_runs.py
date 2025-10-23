@@ -1,4 +1,4 @@
-"""Function to list job runs in a Cloudera ML project."""
+"""Function to list job runs in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def list_job_runs(config, params=None):
     """
-    List job runs in a Cloudera ML project.
+    List job runs in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.
@@ -61,7 +61,7 @@ def list_job_runs(config, params=None):
         # The generic endpoint doesn't seem to work, let the user know they need to provide a job ID
         return {
             "success": False,
-            "message": "A job_id is required. The Cloudera ML API does not support listing all job runs without a specific job ID.",
+            "message": "A job_id is required. The Cloudera AI API does not support listing all job runs without a specific job ID.",
             "data": None
         }
 

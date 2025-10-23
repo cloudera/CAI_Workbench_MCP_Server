@@ -1,4 +1,4 @@
-"""Get runtimes function for Cloudera ML MCP"""
+"""Get runtimes function for Cloudera AI Workbench MCP"""
 
 import requests
 import json
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def get_runtimes(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get available runtimes from Cloudera ML
+    Get available runtimes from Cloudera AI
     
     Args:
         config: MCP configuration

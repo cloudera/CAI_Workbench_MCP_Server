@@ -1,4 +1,4 @@
-"""Delete project file function for Cloudera ML MCP"""
+"""Delete project file function for Cloudera AI Workbench MCP"""
 
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def delete_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete a file or directory from a Cloudera ML project
+    Delete a file or directory from a Cloudera AI project
     
     Args:
         config: MCP configuration with host and api_key

@@ -1,4 +1,4 @@
-"""Delete job function for Cloudera ML MCP"""
+"""Delete job function for Cloudera AI Workbench MCP"""
 
 import os
 import json

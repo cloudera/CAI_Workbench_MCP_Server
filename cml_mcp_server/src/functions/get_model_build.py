@@ -1,4 +1,4 @@
-"""Get model build function for Cloudera ML MCP"""
+"""Get model build function for Cloudera AI Workbench MCP"""
 
 import os
 import json
@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 def get_model_build(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Get details of a specific model build from Cloudera ML
+    Get details of a specific model build from Cloudera AI
     
     Args:
         config (dict): MCP configuration containing host and api_key

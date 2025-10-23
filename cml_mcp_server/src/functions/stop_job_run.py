@@ -1,4 +1,4 @@
-"""Function to stop a running job run in a Cloudera ML project."""
+"""Function to stop a running job run in a Cloudera AI project."""
 
 import json
 import os
@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 def stop_job_run(config, params=None):
     """
-    Stop a running job run in a Cloudera ML project.
+    Stop a running job run in a Cloudera AI project.
 
     Args:
         config (dict): MCP configuration.

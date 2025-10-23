@@ -1,4 +1,4 @@
-"""Create job function for Cloudera ML MCP"""
+"""Create job function for Cloudera AI Workbench MCP"""
 
 import requests
 import json
@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 def create_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create a new Cloudera ML job
+    Create a new Cloudera AI job
     
     Args:
         config: MCP configuration
@@ -61,7 +61,7 @@ def create_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]
         # Using validated runtime from list_runtimes.py
         runtime_identifier = params.get("runtime_identifier")
         if not runtime_identifier:
-            # Default to a runtime available in the Cloudera ML instance
+            # Default to a runtime available in the Cloudera AI instance
             runtime_identifier = "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-jupyterlab-python3.10-standard:2024.10.1-b12"
             print(f"No runtime_identifier provided, using default: {runtime_identifier}")
         

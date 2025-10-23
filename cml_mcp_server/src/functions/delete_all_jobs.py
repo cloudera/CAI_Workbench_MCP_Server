@@ -1,4 +1,4 @@
-"""Delete all jobs function for Cloudera ML MCP"""
+"""Delete all jobs function for Cloudera AI Workbench MCP"""
 
 import requests
 from typing import Dict, Any, List

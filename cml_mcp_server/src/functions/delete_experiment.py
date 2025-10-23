@@ -1,5 +1,5 @@
 """
-Delete an experiment in Cloudera ML
+Delete an experiment in Cloudera AI
 
 SECURITY BEST PRACTICES DEMONSTRATION:
 - Shows INCORRECT curl subprocess approach (commented out)
@@ -15,7 +15,7 @@ from typing import Dict, Any
 
 def delete_experiment(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete an experiment in Cloudera ML
+    Delete an experiment in Cloudera AI
     
     Args:
         config: MCP configuration with host and api_key

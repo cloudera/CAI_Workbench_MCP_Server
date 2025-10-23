@@ -1,13 +1,13 @@
 [project]
 name = "cml-mcp-server"
 version = "1.0.0"
-description = "Cloudera ML Model Context Protocol (MCP) Server"
+description = "Cloudera AI Workbench Model Context Protocol (MCP) Server"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    {name = "Cloudera ML MCP Team"}
+    {name = "Cloudera AI MCP Team"}
 ]
-keywords = ["mcp", "cloudera", "ml", "oauth", "api"]
+keywords = ["mcp", "cloudera", "ai", "workbench", "oauth", "api"]
 license = {text = "Apache-2.0"}
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -49,7 +49,7 @@ dev = [
     "ruff>=0.1.0",
 ]
 
-# Note: cmlapi must be installed separately from your Cloudera ML instance - see README
+# Note: cmlapi must be installed separately from your Cloudera AI instance - see README
 # FastMCP provides the MCP protocol implementation with built-in HTTP support
 
 [project.urls]
