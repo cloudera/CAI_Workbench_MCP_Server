@@ -66,7 +66,7 @@ try:
     from .src.functions.update_project import update_project
     from .src.functions.update_project_file_metadata import update_project_file_metadata
 except ImportError:
-    # Direct execution (python cml_mcp_server/stdio_server.py)
+    # Direct execution (python cai_workbench_mcp_server/stdio_server.py)
     from src.functions.upload_folder import upload_folder
     from src.functions.upload_file import upload_file
     from src.functions.create_job import create_job
@@ -126,9 +126,9 @@ def get_config() -> Dict[str, str]:
         return os.environ.get(env_var, "")
     
     return {
-        "host": read_secret_or_env("cloudera_ml_host", "CLOUDERA_ML_HOST"),
-        "api_key": read_secret_or_env("cloudera_ml_api_key", "CLOUDERA_ML_API_KEY"),
-        "project_id": read_secret_or_env("cloudera_ml_project_id", "CLOUDERA_ML_PROJECT_ID")
+        "host": read_secret_or_env("cai_workbench_host", "CAI_WORKBENCH_HOST"),
+        "api_key": read_secret_or_env("cai_workbench_api_key", "CAI_WORKBENCH_API_KEY"),
+        "project_id": read_secret_or_env("cai_workbench_project_id", "CAI_WORKBENCH_PROJECT_ID")
     }
 
 
@@ -1596,9 +1596,9 @@ def main():
         print(f"Error: Missing required configuration: {', '.join(missing)}", file=sys.stderr)
         print("", file=sys.stderr)
         print("Please set the following environment variables:", file=sys.stderr)
-        print("  CLOUDERA_ML_HOST=https://ml-xxxx.cloudera.site", file=sys.stderr)
-        print("  CLOUDERA_ML_API_KEY=your-api-key", file=sys.stderr)
-        print("  CLOUDERA_ML_PROJECT_ID=your-project-id  # Optional", file=sys.stderr)
+        print("  CAI_WORKBENCH_HOST=https://ml-xxxx.cloudera.site", file=sys.stderr)
+        print("  CAI_WORKBENCH_API_KEY=your-api-key", file=sys.stderr)
+        print("  CAI_WORKBENCH_PROJECT_ID=your-project-id  # Optional", file=sys.stderr)
         exit(1)
     
     # For STDIO, only log to stderr

@@ -72,9 +72,9 @@ def get_config() -> Dict[str, str]:
         return os.environ.get(env_var, "")
     
     return {
-        "host": read_secret_or_env("cloudera_ml_host", "CLOUDERA_ML_HOST"),
-        "api_key": read_secret_or_env("cloudera_ml_api_key", "CLOUDERA_ML_API_KEY"),
-        "project_id": read_secret_or_env("cloudera_ml_project_id", "CLOUDERA_ML_PROJECT_ID")
+        "host": read_secret_or_env("cai_workbench_host", "CAI_WORKBENCH_HOST"),
+        "api_key": read_secret_or_env("cai_workbench_api_key", "CAI_WORKBENCH_API_KEY"),
+        "project_id": read_secret_or_env("cai_workbench_project_id", "CAI_WORKBENCH_PROJECT_ID")
     }
 
 
@@ -345,12 +345,12 @@ def main():
     # Check configuration
     if not config.get("host") or not config.get("api_key"):
         print("Error: Missing required configuration")
-        print("Please set CLOUDERA_ML_HOST and CLOUDERA_ML_API_KEY")
+        print("Please set CAI_WORKBENCH_HOST and CAI_WORKBENCH_API_KEY")
         return
     
     # Get host and port from environment or use defaults
-    host = os.getenv("CML_MCP_HOST", "0.0.0.0")
-    port = int(os.getenv("CML_MCP_PORT", "8000"))
+    host = os.getenv("CAI_MCP_HOST", "0.0.0.0")
+    port = int(os.getenv("CAI_MCP_PORT", "8000"))
     
     print("Starting Cloudera AI HTTP Server...")
     print(f"Connected to: {config['host']}")

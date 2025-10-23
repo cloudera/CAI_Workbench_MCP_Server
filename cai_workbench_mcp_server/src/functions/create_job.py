@@ -118,7 +118,7 @@ def create_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]
         # Print environment variables for debugging (don't print API key)
         print(f"Environment variables:")
         for key, value in os.environ.items():
-            if key.startswith("CLOUDERA_ML") and "API_KEY" not in key:
+            if key.startswith("CAI_WORKBENCH") and "API_KEY" not in key:
                 print(f"  {key}: {value}")
         
         # Send API request

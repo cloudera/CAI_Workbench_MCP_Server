@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Test CML MCP Server using FastMCP Client
+Test CAI Workbench MCP Server using FastMCP Client
 Simple, clean approach - testing representative tools from each category
 
 Note: These tests use mock project IDs. For real testing with actual Cloudera AI:
-- Set environment variables: CLOUDERA_ML_HOST, CLOUDERA_ML_API_KEY, CLOUDERA_ML_PROJECT_ID
+- Set environment variables: CAI_WORKBENCH_HOST, CAI_WORKBENCH_API_KEY, CAI_WORKBENCH_PROJECT_ID
 - Use real project IDs in format: xxxx-xxxx-xxxx-xxxx (e.g., "9er0-ooi9-uopm-8i8o")
 """
 
@@ -17,7 +17,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastmcp import Client
-from cml_mcp_server.stdio_server import mcp
+from cai_workbench_mcp_server.stdio_server import mcp
 
 
 def parse_tool_result(result):
@@ -265,7 +265,7 @@ async def test_experiment_tools():
 async def run_all_tests():
     """Run all test categories"""
     print("\n" + "=" * 60)
-    print("🚀 CML MCP Server Test Suite")
+    print("🚀 CAI Workbehcnk MCP Server Test Suite")
     print("=" * 60)
     
     test_functions = [
@@ -317,7 +317,7 @@ async def quick_smoke_test():
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description="Test CML MCP Server")
+    parser = argparse.ArgumentParser(description="Test CAI Workbench MCP Server")
     parser.add_argument("--quick", action="store_true", help="Run quick smoke test only")
     args = parser.parse_args()
     

@@ -1,4 +1,4 @@
-# Contributing to CML MCP Server
+# Contributing to CAI MCP Workbench Server
 
 Thanks for contributing! Keep it simple.
 
@@ -6,8 +6,8 @@ Thanks for contributing! Keep it simple.
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/YOUR_USERNAME/CML_MCP_Server.git
-cd CML_MCP_Server
+git clone https://github.com/YOUR_USERNAME/CAI_Workbench_MCP_Server.git
+cd CAI_Workbench_MCP_Server
 
 # 2. Install
 pip install uv

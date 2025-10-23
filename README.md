@@ -41,13 +41,13 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/cloudera/CML_MCP_Server.git",
-        "cml-mcp-stdio"
+        "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git",
+        "cai-workbench-mcp-stdio"
       ],
       "env": {
-        "CLOUDERA_ML_HOST": "${CLOUDERA_ML_HOST}",
-        "CLOUDERA_ML_API_KEY": "${CLOUDERA_ML_API_KEY}",
-        "CLOUDERA_ML_PROJECT_ID": "${CLOUDERA_ML_PROJECT_ID}"
+        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
+        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
+        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
       }
     }
   }
@@ -55,9 +55,9 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
 ```
 
 4. **Set environment variables** in Agent Studio settings:
-   - `CLOUDERA_ML_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
-   - `CLOUDERA_ML_API_KEY`: Your API key from Cloudera AI
-   - `CLOUDERA_ML_PROJECT_ID`: Your default project ID (optional)
+   - `CAI_WORKBENCH_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
+   - `CAI_WORKBENCH_API_KEY`: Your API key from Cloudera AI
+   - `CAI_WORKBENCH_PROJECT_ID`: Your default project ID (optional)
 
 5. **Save and test** - Your agent now has access to all 47 Cloudera AI tools!
 
@@ -70,10 +70,10 @@ Configure your Cloudera AI domain first - see [SETUP.md](./SETUP.md).
 
 ```bash
 # Clone repository
-git clone https://github.com/cloudera/CML_MCP_Server.git
-cd cml_mcp_server
+git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
+cd cai_workbench_mcp_server
 
-# Configure your CML domain in Makefile
+# Configure your CAI domain in Makefile
 # Build and test
 make build
 make test
@@ -86,8 +86,8 @@ See [DOCKER.md](./DOCKER.md) for Docker documentation.
 
 #### 1. Clone and setup
 ```bash
-git clone https://github.com/cloudera/CML_MCP_Server.git
-cd cml_mcp_server
+git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
+cd cai_workbench_mcp_server
 uv sync
 ```
 
@@ -105,11 +105,11 @@ Create a `.env` file or export:
 
 ```bash
 # Required
-export CLOUDERA_ML_HOST="https://ml-xxxx.cloudera.site"
-export CLOUDERA_ML_API_KEY="your-api-key"
+export CAI_WORKBENCH_HOST="https://ml-xxxx.cloudera.site"
+export CAI_WORKBENCH_API_KEY="your-api-key"
 
 # Optional  
-export CLOUDERA_ML_PROJECT_ID="your-default-project-id"
+export CAI_WORKBENCH_PROJECT_ID="your-default-project-id"
 ```
 
 ## Usage
@@ -120,10 +120,10 @@ Best for Claude Desktop and secure local usage:
 
 ```bash
 # Run the STDIO server
-uv run -m cml_mcp_server.stdio_server
+uv run -m cai_workbench_mcp_server.stdio_server
 
 # Or use the shortcut
-uvx --from . cml-mcp-stdio
+uvx --from . cai-workbench-mcp-stdio
 ```
 
 #### Configure Claude Desktop
@@ -134,12 +134,12 @@ Add to your Claude Desktop configuration:
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench_mcp": {
       "command": "docker-compose",
       "args": [
         "-f", 
-        "/absolute/path/to/cml_mcp_server/docker-compose.secrets.yml",
-        "run", "--rm", "cml-mcp-server"
+        "/absolute/path/to/cai_workbench_mcp_server/docker-compose.secrets.yml",
+        "run", "--rm", "cai-workbench-mcp-server"
       ]
     }
   }
@@ -150,13 +150,13 @@ Add to your Claude Desktop configuration:
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench_mcp": {
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-e", "CLOUDERA_ML_HOST=https://your-instance.site",
-        "-e", "CLOUDERA_ML_API_KEY=your-api-key",
-        "cml-mcp-server"
+        "-e", "CAI_WORKBENCH_HOST=https://your-instance.site",
+        "-e", "CAI_WORKBENCH_API_KEY=your-api-key",
+        "cai-workbench-mcp-server"
       ]
     }
   }
@@ -169,10 +169,10 @@ Add to your Claude Desktop configuration:
 
 ```bash
 # Start HTTP server on port 8000
-uv run -m cml_mcp_server.http_server
+uv run -m cai_workbench_mcp_server.http_server
 
 # Or use the shortcut
-uvx --from . cml-mcp-http
+uvx --from . cai-workbench-mcp-http
 ```
 
 #### Available Endpoints
@@ -333,7 +333,7 @@ create_model_deployment_tool(
 
 ## Troubleshooting
 
-1. **"Missing required configuration"**: Set CLOUDERA_ML_HOST and CLOUDERA_ML_API_KEY
+1. **"Missing required configuration"**: Set CAI_WORKBENCH_HOST and CAI_WORKBENCH_API_KEY
 2. **"cmlapi not found"**: Install from your Cloudera AI instance
 3. **HTTP connection issues**: Ensure server is running on correct port
 4. **Tool not found**: Check tool name spelling (use `list_tools`)

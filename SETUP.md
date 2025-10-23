@@ -2,13 +2,13 @@
 
 ## Required Configuration
 
-Set the `CLOUDERA_ML_HOST` environment variable before building.
+Set the `CAI_WORKBENCH_HOST` environment variable before building.
 
 ### Step 1: Set Environment Variable
 
 ```bash
 # Set your Cloudera ML host URL
-export CLOUDERA_ML_HOST=https://your-cml-instance.cloudera.site
+export CAI_WORKBENCH_HOST=https://your-cai-instance.cloudera.site
 ```
 
 ### Step 2: Build and Test
@@ -26,11 +26,11 @@ make run
 
 ## Environment Variables
 
-For the server to connect to CML, set these environment variables:
+For the server to connect to CAI, set these environment variables:
 
-- `CLOUDERA_ML_HOST` - Full URL to your CML instance (https://your-domain.com)
-- `CLOUDERA_ML_API_KEY` - Your CML API key
-- `CLOUDERA_ML_PROJECT_ID` - Your project ID (optional)
+- `CAI_WORKBENCH_HOST` - Full URL to your CAI workbench instance (https://your-domain.com)
+- `CAI_WORKBENCH_API_KEY` - Your CAI API key
+- `CAI_WORKBENCH_PROJECT_ID` - Your project ID (optional)
 
 ## Claude Desktop Setup
 
@@ -39,12 +39,12 @@ For the server to connect to CML, set these environment variables:
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench_mcp": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "cml-mcp-server"],
+      "args": ["run", "-i", "--rm", "cai-workbench-mcp-server"],
       "env": {
-        "CLOUDERA_ML_HOST": "https://your-cml-domain.com",
-        "CLOUDERA_ML_API_KEY": "your-api-key-here"
+        "CAI_WORKBENCH_HOST": "https://your-cai-domain.com",
+        "CAI_WORKBENCH_API_KEY": "your-api-key-here"
       }
     }
   }
@@ -56,13 +56,13 @@ For the server to connect to CML, set these environment variables:
 ## Common Issues
 
 **Build fails with "No module named 'cmlapi'"**
-- Your CML_DOMAIN is incorrect or unreachable
-- Check network connectivity to your CML instance
+- CAI workbench domain is not reachable.
+- Check network connectivity.
 
 **Claude Desktop shows JSON parse errors**  
 - Make sure you built the latest Docker image after fixes
 - Use STDIO mode, not HTTP mode for Claude Desktop
 
 **API authentication errors**
-- Check your CLOUDERA_ML_API_KEY is valid
-- Verify CLOUDERA_ML_HOST includes https:// prefix
+- Check your CAI_WORKBENCH_API_KEY is valid
+- Verify CAI_WORKBENCH_HOST includes https:// prefix
