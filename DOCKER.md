@@ -11,7 +11,7 @@
 
 ```bash
 # Set your Cloudera AI host
-export CLOUDERA_ML_HOST=https://your-cml-instance.cloudera.site
+export CAI_WORKBENCH_HOST=https://your-cai-instance.cloudera.site
 ```
 
 ### 2. Build and Run
@@ -33,12 +33,12 @@ make run
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench": {
       "command": "docker-compose",
       "args": [
         "-f", 
-        "/absolute/path/to/cml_mcp_server/docker-compose.secrets.yml",
-        "run", "--rm", "cml-mcp-server"
+        "/absolute/path/to/cai_workbench_mcp_server/docker-compose.secrets.yml",
+        "run", "--rm", "cai-workbench-mcp-server"
       ]
     }
   }
@@ -49,13 +49,13 @@ make run
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench": {
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-e", "CLOUDERA_ML_HOST=https://your-instance.site",
-        "-e", "CLOUDERA_ML_API_KEY=your-api-key",
-        "cml-mcp-server"
+        "-e", "CAI_WORKBENCH_HOST=https://your-instance.site",
+        "-e", "CAI_WORKBENCH_API_KEY=your-api-key",
+        "cai-workbench-mcp-server"
       ]
     }
   }
@@ -73,9 +73,9 @@ For production use, avoid environment variables by using Docker secrets:
 mkdir -p secrets
 
 # Add your credentials (these files are not committed to git)
-echo "https://your-cml-instance.cloudera.site" > secrets/cloudera_ml_host
-echo "your-api-key-here" > secrets/cloudera_ml_api_key
-echo "your-project-id" > secrets/cloudera_ml_project_id
+echo "https://your-cai-instance.cloudera.site" > secrets/cai_workbench_host
+echo "your-api-key-here" > secrets/cai_workbench_api_key
+echo "your-project-id" > secrets/cai_workbench_project_id
 
 # Secure the files
 chmod 600 secrets/*
@@ -84,8 +84,8 @@ chmod 600 secrets/*
 ### Build and Run with Secrets
 
 ```bash
-# Build (still needs CLOUDERA_ML_HOST for cmlapi installation)
-export CLOUDERA_ML_HOST=https://your-cml-instance.cloudera.site
+# Build (still needs CAI_WORKBENCH_HOST for cmlapi installation)
+export CAI_WORKBENCH_HOST=https://your-cai-instance.cloudera.site
 make build
 
 # Run with secrets
@@ -97,14 +97,14 @@ make run-secrets
 ```json
 {
   "mcpServers": {
-    "cml": {
+    "cai_workbench": {
       "command": "docker-compose",
       "args": [
         "-f", 
-        "/absolute/path/to/cml_mcp_server/docker-compose.secrets.yml", 
+        "/absolute/path/to/cai_workbench_mcp_server/docker-compose.secrets.yml", 
         "run", 
         "--rm", 
-        "cml-mcp-server"
+        "cai-workbench-mcp-server"
       ]
     }
   }
@@ -125,8 +125,8 @@ make run-secrets
 ## Troubleshooting
 
 ### Module not found errors
-- Check that your CML_DOMAIN is correct in the Makefile
-- Ensure your CML instance is accessible
+- Check that your CAI_DOMAIN is correct in the Makefile
+- Ensure your CAI instance is accessible
 
 ### Claude Desktop connection issues
 - Make sure you're using STDIO mode (`make run`)

@@ -1,8 +1,8 @@
 # Simple, fast Dockerfile using UV
 FROM python:3.12-slim
 
-# Build argument for Cloudera ML host URL
-ARG CLOUDERA_ML_HOST
+# Build argument for Cloudera AI Workbench host URL
+ARG CAI_WORKBENCH_HOST
 
 # Install system dependencies and UV
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,31 +12,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && mv /root/.local/bin/uv /usr/local/bin/uv \
     && mv /root/.local/bin/uvx /usr/local/bin/uvx
 
-# Create non-root user
-RUN groupadd -r cml && useradd -r -g cml cml
+# Create non-root user (cai for Cloudera AI)
+RUN groupadd -r cai && useradd -r -g cai cai
 
 # Set working directory
 WORKDIR /app
 
 # Copy project files
-COPY --chown=cml:cml pyproject.toml uv.lock ./
-COPY --chown=cml:cml cml_mcp_server/ ./cml_mcp_server/
+COPY --chown=cai:cai pyproject.toml uv.lock ./
+COPY --chown=cai:cai cai_workbench_mcp_server/ ./cai_workbench_mcp_server/
 
 # Install dependencies with UV (much faster than pip!)
 RUN uv sync --frozen
 
-# Install Cloudera ML API (required dependency not in pyproject.toml)
-# Extract domain from CLOUDERA_ML_HOST (strip https://)
-RUN if [ -n "${CLOUDERA_ML_HOST}" ]; then \
-        CML_DOMAIN=$(echo "${CLOUDERA_ML_HOST}" | sed 's|https\?://||' | sed 's|/$||'); \
-        uv pip install https://${CML_DOMAIN}/api/v2/python.tar.gz; \
+# Install Cloudera AI Workbench API (cmlapi - required for upload_folder)
+# Extract domain from CAI_WORKBENCH_HOST (strip https:// and trailing /)
+RUN if [ -n "${CAI_WORKBENCH_HOST}" ]; then \
+        WORKBENCH_DOMAIN=$(echo "${CAI_WORKBENCH_HOST}" | sed 's|https\?://||' | sed 's|/$||'); \
+        echo "Installing cmlapi from https://${WORKBENCH_DOMAIN}/api/v2/python.tar.gz"; \
+        uv pip install https://${WORKBENCH_DOMAIN}/api/v2/python.tar.gz; \
     else \
-        echo "Error: CLOUDERA_ML_HOST build argument required"; \
-        exit 1; \
+        echo "Warning: CAI_WORKBENCH_HOST not provided, skipping cmlapi installation"; \
     fi
 
 # Switch to non-root user
-USER cml
+USER cai
 
 # Activate UV environment
 ENV VIRTUAL_ENV=/app/.venv
@@ -46,4 +46,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
 
 # Default to stdio mode (like Terraform MCP server)
-CMD ["python", "-m", "cml_mcp_server.stdio_server"]
+CMD ["python", "-m", "cai_workbench_mcp_server.stdio_server"]
