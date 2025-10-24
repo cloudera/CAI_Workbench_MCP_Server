@@ -31,8 +31,7 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
 #### Setup 
 
 1. **Navigate to Agent Studio** in your Cloudera AI workspace
-2. **Create a new agent** or edit an existing one
-3. **Add MCP Server** in the configuration:
+2. **Add MCP Server** in the configuration:
 
 ```json
 {
@@ -54,12 +53,12 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
 }
 ```
 
-4. **Set environment variables** in Agent Studio settings:
+3. **Set environment variables** in Agent Studio settings:
    - `CAI_WORKBENCH_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
    - `CAI_WORKBENCH_API_KEY`: Your API key from Cloudera AI
    - `CAI_WORKBENCH_PROJECT_ID`: Your default project ID (optional)
 
-5. **Save and test** - Your agent now has access to all 47 Cloudera AI tools!
+4. **Save and test** - Your agent now has access to all 47 Cloudera AI workbench tools!
 
 
 
