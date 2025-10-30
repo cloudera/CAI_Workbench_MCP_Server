@@ -26,7 +26,7 @@ A Model Context Protocol (MCP) server for Cloudera AI workbench built with FastM
 
 ### Option 1: Cloudera AI Environment(Agent Studio)
 
-The easiest way to use this MCP server is through [Cloudera Agent Studio](https://docs.cloudera.com/ai-assistant/), which provides a managed environment for AI agents.
+The easiest way to use this MCP server is through [Cloudera Agent Studio](https://docs.cloudera.com/machine-learning/cloud/use-ai-studios/topics/ml-agent-studio-overview.html), which provides a managed environment for AI agents.
 
 #### Setup 
 
@@ -345,7 +345,7 @@ create_model_deployment_tool(
 
 ## Related Resources
 
-- [Cloudera AI Workbench](https://docs.cloudera.com/ai-assistant/) - Cloudera AI documentation
+- [Cloudera AI Workbench](https://docs.cloudera.com/machine-learning/1.5.5/workspaces-privatecloud/topics/ml-pvc-provision-ml-workspace.html) - Cloudera AI documentation
 - [FastMCP](https://gofastmcp.com/) - The MCP framework
 - [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
 
