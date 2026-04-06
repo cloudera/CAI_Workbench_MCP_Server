@@ -58,7 +58,7 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
    - `CAI_WORKBENCH_API_KEY`: Your API key from Cloudera AI
    - `CAI_WORKBENCH_PROJECT_ID`: Your default project ID (optional)
 
-4. **Save and test** - Your agent now has access to all 47 Cloudera AI workbench tools!
+4. **Save and test** - Your agent now has access to all **105** Cloudera AI workbench tools (use MCP `tools/list` for the current list).
 
 
 
@@ -70,7 +70,7 @@ Configure your Cloudera AI domain first - see [SETUP.md](./SETUP.md).
 ```bash
 # Clone repository
 git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
-cd cai_workbench_mcp_server
+cd CAI_Workbench_MCP_Server
 
 # Configure your CAI domain in Makefile
 # Build and test
@@ -86,7 +86,7 @@ See [DOCKER.md](./DOCKER.md) for Docker documentation.
 #### 1. Clone and setup
 ```bash
 git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
-cd cai_workbench_mcp_server
+cd CAI_Workbench_MCP_Server
 uv sync
 ```
 
@@ -223,65 +223,57 @@ from fastmcp import Client
 client = Client("http://localhost:8000/mcp-api")
 ```
 
-## Available Tools (47 total)
+## Available Tools (105 total)
 
-### Project Management
-- `list_projects_tool` - List all available projects
-- `get_project_id_tool` - Get project ID from name
-- `update_project_tool` - Update project settings
+The server exposes **105** tools. The authoritative list is whatever the running server returns from MCP `tools/list` or `GET /debug/tools`. Below is a grouped overview (not every tool is listed).
 
-### File Operations
-- `upload_file_tool` - Upload single file
-- `upload_folder_tool` - Upload entire folder
-- `list_project_files_tool` - List files in project
-- `delete_project_file_tool` - Delete file/directory
+### Project management
+- `list_projects_tool`, `get_project_id_tool`, `update_project_tool`
+- `create_project_tool`, `get_project_tool`, `delete_project_tool`, `list_project_names_tool`
+- `list_project_collaborators_tool`, `add_project_collaborator_tool`, `delete_project_collaborator_tool`
 
-### Job Management
-- `create_job_tool` - Create new job
-- `list_jobs_tool` - List all jobs
-- `get_job_tool` - Get job details
-- `update_job_tool` - Update job configuration
-- `delete_job_tool` - Delete a job
-- `create_job_run_tool` - Run a job
-- `list_job_runs_tool` - List job runs
-- `get_job_run_tool` - Get run details
-- `stop_job_run_tool` - Stop running job
+### File operations
+- `upload_file_tool`, `upload_folder_tool`, `list_project_files_tool`, `delete_project_file_tool`, `update_project_file_metadata_tool`, `download_project_file_tool`
 
-### Model Management
-- `list_models_tool` - List all models
-- `get_model_tool` - Get model details
-- `create_model_build_tool` - Build a model
-- `list_model_builds_tool` - List model builds
-- `get_model_build_tool` - Get build details
-- `create_model_deployment_tool` - Deploy a model
-- `list_model_deployments_tool` - List deployments
-- `get_model_deployment_tool` - Get deployment details
-- `stop_model_deployment_tool` - Stop deployment
-- `delete_model_tool` - Delete a model
+### Jobs
+- `create_job_tool`, `list_jobs_tool`, `get_job_tool`, `update_job_tool`, `delete_job_tool`, `delete_all_jobs_tool`
+- `create_job_run_tool`, `list_job_runs_tool`, `get_job_run_tool`, `stop_job_run_tool`
+- Workspace-wide: `list_all_jobs_tool`
 
-### Experiment Tracking
-- `create_experiment_tool` - Create experiment
-- `list_experiments_tool` - List experiments
-- `get_experiment_tool` - Get experiment details
-- `update_experiment_tool` - Update experiment
-- `delete_experiment_tool` - Delete experiment
-- `create_experiment_run_tool` - Create run
-- `get_experiment_run_tool` - Get run details
-- `update_experiment_run_tool` - Update run
-- `delete_experiment_run_tool` - Delete run
-- `log_experiment_run_batch_tool` - Log batch metrics
+### Models (deployments & builds)
+- `list_models_tool`, `get_model_tool`, `delete_model_tool`, `create_model_tool`, `update_model_tool`
+- `create_model_build_tool`, `list_model_builds_tool`, `get_model_build_tool`, `delete_model_build_tool`
+- `create_model_deployment_tool`, `list_model_deployments_tool`, `get_model_deployment_tool`, `stop_model_deployment_tool`, `restart_model_deployment_tool`
+- Workspace-wide: `list_all_models_tool`
 
-### Application Management
-- `create_application_tool` - Create application
-- `list_applications_tool` - List applications
-- `get_application_tool` - Get app details
-- `update_application_tool` - Update app
-- `restart_application_tool` - Restart app
-- `stop_application_tool` - Stop app
-- `delete_application_tool` - Delete app
+### Model registry (MLflow-linked)
+- `list_registered_models_tool`, `create_registered_model_tool`, `get_registered_model_tool`, `update_registered_model_tool`, `delete_registered_model_tool`
+- `update_registered_model_version_tool`, `get_registered_model_version_tool`, `delete_registered_model_version_tool`
 
-### System Information
-- `get_runtimes_tool` - Get available ML runtimes
+For `create_registered_model_tool`, **`tags`** is passed through the MCP as a string. Use a **JSON array** string, for example `[{"key":"env","value":"prod"}]`, so the payload matches the API.
+
+### Experiments
+- Per-project: `create_experiment_tool`, `list_experiments_tool`, `get_experiment_tool`, `update_experiment_tool`, `delete_experiment_tool`
+- Runs: `create_experiment_run_tool`, `get_experiment_run_tool`, `update_experiment_run_tool`, `delete_experiment_run_tool`, `delete_experiment_run_batch_tool`, `log_experiment_run_batch_tool`
+- Workspace-wide: `list_all_experiments_tool`, `list_experiment_runs_tool`, `get_experiment_run_metrics_tool`
+
+### Applications
+- `create_application_tool`, `list_applications_tool`, `get_application_tool`, `update_application_tool`, `restart_application_tool`, `stop_application_tool`, `delete_application_tool`
+
+### Runtimes, repos, Docker, API keys
+- `get_runtimes_tool`, `list_runtimes_tool`, `list_runtime_addons_tool`, `list_runtime_repos_tool`, `create_runtime_repo_tool`, `delete_runtime_repo_tool`, `update_runtime_repo_tool`
+- `register_custom_runtime_tool`, `update_runtime_status_tool`, `update_runtime_addon_status_tool`
+- `list_docker_credentials_tool`, `create_docker_credential_tool`, `delete_docker_credential_tool`, `set_docker_credential_tool`
+- `list_v2_keys_tool`, `create_v2_key_tool`, `delete_v2_key_tool`, `delete_v2_keys_tool`, `validate_api_key_tool`
+
+### Quotas, workload, platform
+- `list_cpu_profiles_tool`, `list_groups_quota_tool`, `list_users_quota_tool`, `list_teams_accelerator_quota_tool`, `list_users_accelerator_quota_tool`, `list_usage_tool`
+- `get_default_quota_tool`, `get_default_quotas_tool`, `list_all_resource_groups_tool`, `list_all_accelerator_node_labels_tool`
+- `list_news_feeds_tool`, `list_ml_serving_apps_tool`, `list_workload_executions_tool`, `list_workload_status_tool`, `list_workload_types_tool`
+
+### Optional sample script (MLflow / XGBoost)
+
+`inference_test.py` at the repository root is an **optional** end-to-end sample: train a small XGBoost model, log it with MLflow (experiment `xgboost-mcp`), and optionally register via the registry. It is **not** part of the MCP package dependencies. Install extras locally, for example: `uv pip install mlflow xgboost scikit-learn`. Runs inside a Cloudera AI workbench session work without extra tracking URI setup; from a laptop you must align `MLFLOW_TRACKING_URI` / auth with your environment.
 
 ## Examples
 

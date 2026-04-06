@@ -33,6 +33,64 @@ try:
     from .src.functions.create_model_build import create_model_build
     from .src.functions.create_model_deployment import create_model_deployment
     from .src.functions.create_application import create_application
+    from .src.functions.list_registered_models import list_registered_models
+    from .src.functions.create_registered_model import create_registered_model
+    from .src.functions.update_registered_model import update_registered_model
+    from .src.functions.get_registered_model import get_registered_model
+    from .src.functions.delete_registered_model import delete_registered_model
+    from .src.functions.update_registered_model_version import update_registered_model_version
+    from .src.functions.get_registered_model_version import get_registered_model_version
+    from .src.functions.delete_registered_model_version import delete_registered_model_version
+    from .src.functions.list_runtimes import list_runtimes
+    from .src.functions.list_runtime_addons import list_runtime_addons
+    from .src.functions.list_runtime_repos import list_runtime_repos
+    from .src.functions.create_runtime_repo import create_runtime_repo
+    from .src.functions.delete_runtime_repo import delete_runtime_repo
+    from .src.functions.update_runtime_repo import update_runtime_repo
+    from .src.functions.register_custom_runtime import register_custom_runtime
+    from .src.functions.update_runtime_status import update_runtime_status
+    from .src.functions.update_runtime_addon_status import update_runtime_addon_status
+    from .src.functions.list_docker_credentials import list_docker_credentials
+    from .src.functions.create_docker_credential import create_docker_credential
+    from .src.functions.delete_docker_credential import delete_docker_credential
+    from .src.functions.set_docker_credential import set_docker_credential
+    from .src.functions.list_v2_keys import list_v2_keys
+    from .src.functions.create_v2_key import create_v2_key
+    from .src.functions.delete_v2_key import delete_v2_key
+    from .src.functions.delete_v2_keys import delete_v2_keys
+    from .src.functions.validate_api_key import validate_api_key
+    from .src.functions.list_cpu_profiles import list_cpu_profiles
+    from .src.functions.list_groups_quota import list_groups_quota
+    from .src.functions.list_users_quota import list_users_quota
+    from .src.functions.list_teams_accelerator_quota import list_teams_accelerator_quota
+    from .src.functions.list_users_accelerator_quota import list_users_accelerator_quota
+    from .src.functions.list_usage import list_usage
+    from .src.functions.list_news_feeds import list_news_feeds
+    from .src.functions.list_ml_serving_apps import list_ml_serving_apps
+    from .src.functions.list_workload_executions import list_workload_executions
+    from .src.functions.list_workload_status import list_workload_status
+    from .src.functions.list_workload_types import list_workload_types
+    from .src.functions.get_default_quota import get_default_quota
+    from .src.functions.get_default_quotas import get_default_quotas
+    from .src.functions.list_all_resource_groups import list_all_resource_groups
+    from .src.functions.list_all_accelerator_node_labels import list_all_accelerator_node_labels
+    from .src.functions.create_project import create_project
+    from .src.functions.get_project import get_project
+    from .src.functions.delete_project import delete_project
+    from .src.functions.list_project_names import list_project_names
+    from .src.functions.list_project_collaborators import list_project_collaborators
+    from .src.functions.delete_project_collaborator import delete_project_collaborator
+    from .src.functions.add_project_collaborator import add_project_collaborator
+    from .src.functions.list_all_experiments import list_all_experiments
+    from .src.functions.list_experiment_runs import list_experiment_runs
+    from .src.functions.get_experiment_run_metrics import get_experiment_run_metrics
+    from .src.functions.list_all_jobs import list_all_jobs
+    from .src.functions.list_all_models import list_all_models
+    from .src.functions.create_model import create_model
+    from .src.functions.update_model import update_model
+    from .src.functions.delete_model_build import delete_model_build
+    from .src.functions.restart_model_deployment import restart_model_deployment
+    from .src.functions.download_project_file import download_project_file
     from .src.functions.delete_application import delete_application
     from .src.functions.delete_experiment import delete_experiment
     from .src.functions.delete_experiment_run import delete_experiment_run
@@ -81,6 +139,64 @@ except ImportError:
     from src.functions.create_model_build import create_model_build
     from src.functions.create_model_deployment import create_model_deployment
     from src.functions.create_application import create_application
+    from src.functions.list_registered_models import list_registered_models
+    from src.functions.create_registered_model import create_registered_model
+    from src.functions.update_registered_model import update_registered_model
+    from src.functions.get_registered_model import get_registered_model
+    from src.functions.delete_registered_model import delete_registered_model
+    from src.functions.update_registered_model_version import update_registered_model_version
+    from src.functions.get_registered_model_version import get_registered_model_version
+    from src.functions.delete_registered_model_version import delete_registered_model_version
+    from src.functions.list_runtimes import list_runtimes
+    from src.functions.list_runtime_addons import list_runtime_addons
+    from src.functions.list_runtime_repos import list_runtime_repos
+    from src.functions.create_runtime_repo import create_runtime_repo
+    from src.functions.delete_runtime_repo import delete_runtime_repo
+    from src.functions.update_runtime_repo import update_runtime_repo
+    from src.functions.register_custom_runtime import register_custom_runtime
+    from src.functions.update_runtime_status import update_runtime_status
+    from src.functions.update_runtime_addon_status import update_runtime_addon_status
+    from src.functions.list_docker_credentials import list_docker_credentials
+    from src.functions.create_docker_credential import create_docker_credential
+    from src.functions.delete_docker_credential import delete_docker_credential
+    from src.functions.set_docker_credential import set_docker_credential
+    from src.functions.list_v2_keys import list_v2_keys
+    from src.functions.create_v2_key import create_v2_key
+    from src.functions.delete_v2_key import delete_v2_key
+    from src.functions.delete_v2_keys import delete_v2_keys
+    from src.functions.validate_api_key import validate_api_key
+    from src.functions.list_cpu_profiles import list_cpu_profiles
+    from src.functions.list_groups_quota import list_groups_quota
+    from src.functions.list_users_quota import list_users_quota
+    from src.functions.list_teams_accelerator_quota import list_teams_accelerator_quota
+    from src.functions.list_users_accelerator_quota import list_users_accelerator_quota
+    from src.functions.list_usage import list_usage
+    from src.functions.list_news_feeds import list_news_feeds
+    from src.functions.list_ml_serving_apps import list_ml_serving_apps
+    from src.functions.list_workload_executions import list_workload_executions
+    from src.functions.list_workload_status import list_workload_status
+    from src.functions.list_workload_types import list_workload_types
+    from src.functions.get_default_quota import get_default_quota
+    from src.functions.get_default_quotas import get_default_quotas
+    from src.functions.list_all_resource_groups import list_all_resource_groups
+    from src.functions.list_all_accelerator_node_labels import list_all_accelerator_node_labels
+    from src.functions.create_project import create_project
+    from src.functions.get_project import get_project
+    from src.functions.delete_project import delete_project
+    from src.functions.list_project_names import list_project_names
+    from src.functions.list_project_collaborators import list_project_collaborators
+    from src.functions.delete_project_collaborator import delete_project_collaborator
+    from src.functions.add_project_collaborator import add_project_collaborator
+    from src.functions.list_all_experiments import list_all_experiments
+    from src.functions.list_experiment_runs import list_experiment_runs
+    from src.functions.get_experiment_run_metrics import get_experiment_run_metrics
+    from src.functions.list_all_jobs import list_all_jobs
+    from src.functions.list_all_models import list_all_models
+    from src.functions.create_model import create_model
+    from src.functions.update_model import update_model
+    from src.functions.delete_model_build import delete_model_build
+    from src.functions.restart_model_deployment import restart_model_deployment
+    from src.functions.download_project_file import download_project_file
     from src.functions.delete_application import delete_application
     from src.functions.delete_experiment import delete_experiment
     from src.functions.delete_experiment_run import delete_experiment_run
@@ -1585,6 +1701,804 @@ def delete_application_tool(application_id: str, project_id: str = None) -> str:
     return json.dumps(result, indent=2)
 
 
+@mcp.tool()
+def create_project_tool(name: str, description: str = None, template: str = None, default_project_engine_type: str = None) -> str:
+    """
+    create_project tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if name is not None:
+        params_dict['name'] = name
+    if description is not None:
+        params_dict['description'] = description
+    if template is not None:
+        params_dict['template'] = template
+    if default_project_engine_type is not None:
+        params_dict['default_project_engine_type'] = default_project_engine_type
+
+        
+    result = create_project(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def get_project_tool(project_id: str) -> str:
+    """
+    get_project tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+
+        
+    result = get_project(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def delete_project_tool(project_id: str) -> str:
+    """
+    delete_project tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+
+        
+    result = delete_project(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_project_names_tool(search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_project_names tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if sort is not None:
+        params_dict['sort'] = sort
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_project_names(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_project_collaborators_tool(project_id: str, search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_project_collaborators tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if sort is not None:
+        params_dict['sort'] = sort
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_project_collaborators(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def delete_project_collaborator_tool(project_id: str, username: str) -> str:
+    """
+    delete_project_collaborator tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if username is not None:
+        params_dict['username'] = username
+
+        
+    result = delete_project_collaborator(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def add_project_collaborator_tool(project_id: str, username: str, permission: str) -> str:
+    """
+    add_project_collaborator tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if username is not None:
+        params_dict['username'] = username
+    if permission is not None:
+        params_dict['permission'] = permission
+
+        
+    result = add_project_collaborator(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_all_experiments_tool(search_filter: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_all_experiments tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_all_experiments(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_experiment_runs_tool(project_id: str, experiment_id: str, search_filter: str = None, page_size: int = None, page_token: str = None, sort: str = None) -> str:
+    """
+    list_experiment_runs tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if experiment_id is not None:
+        params_dict['experiment_id'] = experiment_id
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+    if sort is not None:
+        params_dict['sort'] = sort
+
+        
+    result = list_experiment_runs(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def get_experiment_run_metrics_tool(project_id: str, experiment_id: str, run_id: str, metric_key: str) -> str:
+    """
+    get_experiment_run_metrics tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if experiment_id is not None:
+        params_dict['experiment_id'] = experiment_id
+    if run_id is not None:
+        params_dict['run_id'] = run_id
+    if metric_key is not None:
+        params_dict['metric_key'] = metric_key
+
+        
+    result = get_experiment_run_metrics(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_all_jobs_tool(search_filter: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_all_jobs tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_all_jobs(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def list_all_models_tool(search_filter: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_all_models tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_all_models(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def create_model_tool(project_id: str, name: str, description: str = None, disable_authentication: bool = None) -> str:
+    """
+    create_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if name is not None:
+        params_dict['name'] = name
+    if description is not None:
+        params_dict['description'] = description
+    if disable_authentication is not None:
+        params_dict['disable_authentication'] = disable_authentication
+
+        
+    result = create_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def update_model_tool(project_id: str, model_id: str, name: str = None, description: str = None, visibility: str = None) -> str:
+    """
+    update_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if name is not None:
+        params_dict['name'] = name
+    if description is not None:
+        params_dict['description'] = description
+    if visibility is not None:
+        params_dict['visibility'] = visibility
+
+        
+    result = update_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def delete_model_build_tool(project_id: str, model_id: str, build_id: str) -> str:
+    """
+    delete_model_build tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if build_id is not None:
+        params_dict['build_id'] = build_id
+
+        
+    result = delete_model_build(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def restart_model_deployment_tool(project_id: str, model_id: str, build_id: str, deployment_id: str) -> str:
+    """
+    restart_model_deployment tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if build_id is not None:
+        params_dict['build_id'] = build_id
+    if deployment_id is not None:
+        params_dict['deployment_id'] = deployment_id
+
+        
+    result = restart_model_deployment(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def download_project_file_tool(project_id: str, path: str) -> str:
+    """
+    download_project_file tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if path is not None:
+        params_dict['path'] = path
+
+        
+    result = download_project_file(config, params_dict)
+    return json.dumps(result, indent=2)
+
+
+@mcp.tool()
+def list_registered_models_tool(search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    list_registered_models tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if sort is not None:
+        params_dict['sort'] = sort
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = list_registered_models(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def create_registered_model_tool(project_id: str, experiment_id: str, run_id: str, model_path: str, model_name: str, tags: str = None, description: str = None, notes: str = None, visibility: str = None) -> str:
+    """
+    create_registered_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if project_id is not None:
+        params_dict['project_id'] = project_id
+    if experiment_id is not None:
+        params_dict['experiment_id'] = experiment_id
+    if run_id is not None:
+        params_dict['run_id'] = run_id
+    if model_path is not None:
+        params_dict['model_path'] = model_path
+    if model_name is not None:
+        params_dict['model_name'] = model_name
+    if tags is not None:
+        params_dict['tags'] = tags
+    if description is not None:
+        params_dict['description'] = description
+    if notes is not None:
+        params_dict['notes'] = notes
+    if visibility is not None:
+        params_dict['visibility'] = visibility
+
+        
+    result = create_registered_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def update_registered_model_tool(model_id: str, description: str = None, visibility: str = None, user_id: str = None) -> str:
+    """
+    update_registered_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if description is not None:
+        params_dict['description'] = description
+    if visibility is not None:
+        params_dict['visibility'] = visibility
+    if user_id is not None:
+        params_dict['user_id'] = user_id
+
+        
+    result = update_registered_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def get_registered_model_tool(model_id: str, search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None) -> str:
+    """
+    get_registered_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if search_filter is not None:
+        params_dict['search_filter'] = search_filter
+    if sort is not None:
+        params_dict['sort'] = sort
+    if page_size is not None:
+        params_dict['page_size'] = page_size
+    if page_token is not None:
+        params_dict['page_token'] = page_token
+
+        
+    result = get_registered_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def delete_registered_model_tool(model_id: str) -> str:
+    """
+    delete_registered_model tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+
+        
+    result = delete_registered_model(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def update_registered_model_version_tool(model_id: str, model_version_id: str, notes: str = None, tags: str = None) -> str:
+    """
+    update_registered_model_version tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if model_version_id is not None:
+        params_dict['model_version_id'] = model_version_id
+    if notes is not None:
+        params_dict['notes'] = notes
+    if tags is not None:
+        params_dict['tags'] = tags
+
+        
+    result = update_registered_model_version(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def get_registered_model_version_tool(model_id: str, version_id: str) -> str:
+    """
+    get_registered_model_version tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if version_id is not None:
+        params_dict['version_id'] = version_id
+
+        
+    result = get_registered_model_version(config, params_dict)
+    return json.dumps(result, indent=2)
+
+@mcp.tool()
+def delete_registered_model_version_tool(model_id: str, version_id: str) -> str:
+    """
+    delete_registered_model_version tool.
+    """
+    config = get_config()
+    
+    params_dict = {}
+    if model_id is not None:
+        params_dict['model_id'] = model_id
+    if version_id is not None:
+        params_dict['version_id'] = version_id
+
+        
+    result = delete_registered_model_version(config, params_dict)
+    return json.dumps(result, indent=2)
+
+
+# --- Runtimes administration ---
+@mcp.tool()
+def list_runtimes_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List runtimes (raw API v2). Optional: search_filter, sort, page_size, page_token."""
+    p = {}
+    if search_filter is not None:
+        p["search_filter"] = search_filter
+    if sort is not None:
+        p["sort"] = sort
+    if page_size is not None:
+        p["page_size"] = page_size
+    if page_token is not None:
+        p["page_token"] = page_token
+    return json.dumps(list_runtimes(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_runtime_addons_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List runtime addons."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_runtime_addons(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_runtime_repos_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List runtime repos."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_runtime_repos(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def create_runtime_repo_tool(body_json: str) -> str:
+    """Create runtime repo. body_json: CreateRuntimeRepoRequest as JSON object."""
+    return json.dumps(create_runtime_repo(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def delete_runtime_repo_tool(runtime_repo_id: int) -> str:
+    """Delete a runtime repo by id."""
+    return json.dumps(delete_runtime_repo(get_config(), {"runtime_repo_id": runtime_repo_id}), indent=2)
+
+
+@mcp.tool()
+def update_runtime_repo_tool(runtimerepo_id: int, body_json: str) -> str:
+    """PATCH runtime repo. body_json: fields to update."""
+    return json.dumps(
+        update_runtime_repo(get_config(), {"runtimerepo_id": runtimerepo_id, "body": json.loads(body_json)}),
+        indent=2,
+    )
+
+
+@mcp.tool()
+def register_custom_runtime_tool(body_json: str) -> str:
+    """Register custom runtime (POST /api/v2/runtimes). body_json: RegisterCustomRuntimeRequest."""
+    return json.dumps(register_custom_runtime(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def update_runtime_status_tool(body_json: str) -> str:
+    """Update runtime status (POST runtimes:update)."""
+    return json.dumps(update_runtime_status(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def update_runtime_addon_status_tool(body_json: str) -> str:
+    """Update runtime addon status."""
+    return json.dumps(update_runtime_addon_status(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+# --- Access & credentials ---
+@mcp.tool()
+def list_docker_credentials_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List Docker registry credentials."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_docker_credentials(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def create_docker_credential_tool(body_json: str) -> str:
+    """Create Docker credential."""
+    return json.dumps(create_docker_credential(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def delete_docker_credential_tool(docker_credential_id: str) -> str:
+    """Delete a Docker credential by id."""
+    return json.dumps(delete_docker_credential(get_config(), {"docker_credential_id": docker_credential_id}), indent=2)
+
+
+@mcp.tool()
+def set_docker_credential_tool(body_json: str) -> str:
+    """Set Docker credential for runtime (runtimes/credential:set)."""
+    return json.dumps(set_docker_credential(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def list_v2_keys_tool(username: str) -> str:
+    """List API v2 keys for a user."""
+    return json.dumps(list_v2_keys(get_config(), {"username": username}), indent=2)
+
+
+@mcp.tool()
+def create_v2_key_tool(username: str, body_json: str) -> str:
+    """Create API v2 key."""
+    return json.dumps(create_v2_key(get_config(), {"username": username, "body": json.loads(body_json)}), indent=2)
+
+
+@mcp.tool()
+def delete_v2_key_tool(username: str, key_id: str) -> str:
+    """Delete one API v2 key."""
+    return json.dumps(delete_v2_key(get_config(), {"username": username, "key_id": key_id}), indent=2)
+
+
+@mcp.tool()
+def delete_v2_keys_tool(username: str) -> str:
+    """Delete all API v2 keys for a user."""
+    return json.dumps(delete_v2_keys(get_config(), {"username": username}), indent=2)
+
+
+@mcp.tool()
+def validate_api_key_tool(body_json: str) -> str:
+    """Validate API v2 key (POST /api/v2/auth/validate_key)."""
+    return json.dumps(validate_api_key(get_config(), {"body": json.loads(body_json)}), indent=2)
+
+
+# --- Global listings & admin ---
+@mcp.tool()
+def list_cpu_profiles_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List CPU profiles."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_cpu_profiles(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_groups_quota_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List groups and quotas (admin)."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_groups_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_users_quota_tool(
+    search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
+) -> str:
+    """List users and quotas (admin)."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_users_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_teams_accelerator_quota_tool(search_filter: str = None) -> str:
+    """List team accelerator quota."""
+    p = {}
+    if search_filter is not None:
+        p["search_filter"] = search_filter
+    return json.dumps(list_teams_accelerator_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_users_accelerator_quota_tool(search_filter: str = None) -> str:
+    """List user accelerator quota."""
+    p = {}
+    if search_filter is not None:
+        p["search_filter"] = search_filter
+    return json.dumps(list_users_accelerator_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_usage_tool(
+    search_filter: str = None,
+    sort: str = None,
+    page_size: int = None,
+    page_token: str = None,
+    multi_column_search_filter: str = None,
+    time_range_search_filter: str = None,
+) -> str:
+    """List workspace usage (admin view)."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter,
+        "sort": sort,
+        "page_size": page_size,
+        "page_token": page_token,
+        "multi_column_search_filter": multi_column_search_filter,
+        "time_range_search_filter": time_range_search_filter,
+    }.items() if v is not None}
+    return json.dumps(list_usage(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_news_feeds_tool(category: str, page_size: int = None, page_token: str = None) -> str:
+    """List news feeds for a category."""
+    p = {"category": category}
+    if page_size is not None:
+        p["page_size"] = page_size
+    if page_token is not None:
+        p["page_token"] = page_token
+    return json.dumps(list_news_feeds(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_ml_serving_apps_tool(force_refresh: bool = None) -> str:
+    """List ML Serving apps."""
+    p = {}
+    if force_refresh is not None:
+        p["force_refresh"] = force_refresh
+    return json.dumps(list_ml_serving_apps(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_workload_executions_tool(
+    search_filter: str = None,
+    page_size: int = None,
+    page_token: str = None,
+    sort: str = None,
+    multi_column_search_filter: str = None,
+    time_range_search_filter: str = None,
+) -> str:
+    """List workload executions."""
+    p = {k: v for k, v in {
+        "search_filter": search_filter,
+        "page_size": page_size,
+        "page_token": page_token,
+        "sort": sort,
+        "multi_column_search_filter": multi_column_search_filter,
+        "time_range_search_filter": time_range_search_filter,
+    }.items() if v is not None}
+    return json.dumps(list_workload_executions(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_workload_status_tool() -> str:
+    """List workload status enum values."""
+    return json.dumps(list_workload_status(get_config(), {}), indent=2)
+
+
+@mcp.tool()
+def list_workload_types_tool() -> str:
+    """List workload types."""
+    return json.dumps(list_workload_types(get_config(), {}), indent=2)
+
+
+@mcp.tool()
+def get_default_quota_tool(uuid: str = None) -> str:
+    """Get default user quota (optional uuid query)."""
+    p = {}
+    if uuid is not None:
+        p["uuid"] = uuid
+    return json.dumps(get_default_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def get_default_quotas_tool(uuid: str = None) -> str:
+    """Get all default quotas."""
+    p = {}
+    if uuid is not None:
+        p["uuid"] = uuid
+    return json.dumps(get_default_quotas(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_all_resource_groups_tool() -> str:
+    """List resource groups."""
+    return json.dumps(list_all_resource_groups(get_config(), {}), indent=2)
+
+
+@mcp.tool()
+def list_all_accelerator_node_labels_tool() -> str:
+    """List accelerator node labels."""
+    return json.dumps(list_all_accelerator_node_labels(get_config(), {}), indent=2)
+
+
 def main():
     """Main entry point for the Cloudera AI Workbench MCP STDIO server."""
     # Check required configuration
@@ -1604,7 +2518,7 @@ def main():
     # For STDIO, only log to stderr
     print(f"Starting Cloudera AI Workbench MCP Server (STDIO mode)...", file=sys.stderr)
     print(f"Connected to: {config['host']}", file=sys.stderr)
-    print("47 tools available", file=sys.stderr)
+    print("105 tools available", file=sys.stderr)
     print("🔒 Secure Transport: Using environment variables for authentication", file=sys.stderr)
     
     # Run STDIO server (default transport)

@@ -8,6 +8,9 @@ Note: These tests use mock project IDs. For real testing with actual Cloudera AI
 - Use real project IDs in format: xxxx-xxxx-xxxx-xxxx (e.g., "9er0-ooi9-uopm-8i8o")
 """
 
+from fastmcp.client.transports import FastMCPTransport
+
+
 import asyncio
 import json
 import sys
@@ -17,6 +20,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastmcp import Client
+from fastmcp.client.transports import FastMCPTransport
 from cai_workbench_mcp_server.stdio_server import mcp
 
 
@@ -49,7 +53,7 @@ async def test_server_basics():
         print(f"✅ Found {len(tools)} tools")
         
         # Verify we have the expected number
-        assert len(tools) == 47, f"Expected 47 tools, found {len(tools)}"
+        assert len(tools) == 105, f"Expected 105 tools, found {len(tools)}"
         print("✅ Tool count verified")
 
 
