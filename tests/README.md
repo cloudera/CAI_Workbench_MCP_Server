@@ -163,13 +163,10 @@ export CAI_WORKBENCH_PROJECT_ID="your-project-id"
 ## Test Requirements
 
 ### Dependencies
-All test dependencies are included in `pyproject.toml`:
-```toml
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-]
+Install dev dependencies (including `pytest` and `pytest-asyncio`):
+
+```bash
+uv sync --group dev
 ```
 
 ### Python Version
