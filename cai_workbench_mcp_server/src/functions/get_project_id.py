@@ -46,9 +46,23 @@ def get_project_id(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, 
         }
         
         print(f"Making request to: {url}")  # Debug output
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        data = response.json()
+        # Paginate. The Cloudera v2 API defaults page_size to 10 and uses
+        # next_page_token for pagination; without this the caller silently
+        # misses any projects beyond the first page (issue #9).
+        all_projects = []
+        page_token = ""
+        while True:
+            req_params = {"page_size": 200}
+            if page_token:
+                req_params["page_token"] = page_token
+            response = requests.get(url, headers=headers, params=req_params)
+            response.raise_for_status()
+            page = response.json()
+            all_projects.extend(page.get("projects") or [])
+            page_token = page.get("next_page_token") or ""
+            if not page_token:
+                break
+        data = {"projects": all_projects}
         
         # Handle special case for listing all projects
         if project_name == "*":
