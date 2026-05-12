@@ -67,11 +67,12 @@ def list_project_files(config, params):
     # Print the formatted host for debugging
     print(f"Formatted host: {host}")
 
-    # Build the API URL
+    # Build the API URL. The Cloudera v2 API expects a subdirectory path as a
+    # URL segment; query parameter paths are ignored and return the root.
     url = f"{host}/api/v2/projects/{project_id}/files"
-    if path:
-        # Add query parameter for path with proper URL encoding
-        url += f"?path={quote(path)}"
+    normalized_path = str(path).strip().strip("/")
+    if normalized_path:
+        url += f"/{quote(normalized_path, safe='/')}"
     
     print(f"Accessing: {url}")
 

@@ -46,12 +46,26 @@ def delete_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[
     api_key = config.get("api_key")
     if not api_key:
         return {"success": False, "message": "Missing api_key in configuration"}
-    
-    # URL encode the file path
-    encoded_file_path = quote(file_path)
-    
-    # Build the URL for the delete request
-    delete_url = f"{host}/api/v2/projects/{project_id}/files?path={encoded_file_path}"
+
+    host = host.rstrip("/")
+
+    # Refuse paths that resolve to the project file root or traverse upward.
+    # This tool should never issue DELETE on /files itself.
+    normalized_path = file_path.strip().strip("/")
+    path_parts = [part for part in normalized_path.split("/") if part]
+    if not path_parts or any(part in (".", "..") for part in path_parts):
+        return {
+            "success": False,
+            "message": (
+                "Refusing to delete: file_path must target a file or directory "
+                "inside the project and cannot contain '.' or '..' path segments."
+            ),
+        }
+
+    # Build the URL for the delete request. The Cloudera v2 API expects the
+    # path as a URL segment; query parameter paths are ignored by the API.
+    encoded_file_path = quote("/".join(path_parts), safe="/")
+    delete_url = f"{host}/api/v2/projects/{project_id}/files/{encoded_file_path}"
     print(f"Deleting project file with URL: {delete_url}")
     
     # Setup headers
