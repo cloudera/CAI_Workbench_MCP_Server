@@ -138,96 +138,416 @@ def get_config() -> Dict[str, str]:
 # Initialize FastMCP server for HTTP
 mcp = FastMCP("cloudera-ml-http")
 
-# Complete tool implementations mapping 
-TOOL_IMPLEMENTATIONS = {
-    # File operations
-    "upload_folder_tool": lambda **p: json.dumps(upload_folder(get_config(), {
-        "folder_path": p.get("folder_path"),
-        "ignore_folders": p.get("ignore_folders", "").split(",") if p.get("ignore_folders") else None
-    }), indent=2),
-    "upload_file_tool": lambda **p: json.dumps(upload_file(get_config(), {
-        "file_path": p.get("file_path"),
-        "target_name": p.get("target_name"),
-        "target_dir": p.get("target_dir")
-    }), indent=2),
-    
-    # Job operations
-    "create_job_tool": lambda **p: create_job(get_config(), p),
-    "list_jobs_tool": lambda **p: list_jobs(get_config(), {}),
-    "get_job_tool": lambda **p: json.dumps(get_job(get_config(), {
-        "job_id": p.get("job_id"),
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    "update_job_tool": lambda **p: json.dumps(update_job(get_config(), p), indent=2),
-    "delete_job_tool": lambda **p: delete_job(get_config(), {"job_id": p.get("job_id")}),
-    "delete_all_jobs_tool": lambda **p: delete_all_jobs(get_config(), {}),
-    
-    # Project operations
-    "get_project_id_tool": lambda **p: json.dumps(get_project_id(get_config(), {"project_name": p.get("project_name")}), indent=2),
-    "list_projects_tool": lambda **p: json.dumps(get_project_id(get_config(), {"project_name": "*"}), indent=2),
-    "update_project_tool": lambda **p: json.dumps(update_project(get_config(), p), indent=2),
 
-    # Job run operations
-    "create_job_run_tool": lambda **p: json.dumps(create_job_run(get_config(), p), indent=2),
-    "list_job_runs_tool": lambda **p: json.dumps(list_job_runs(get_config(), p), indent=2),
-    "get_job_run_tool": lambda **p: json.dumps(get_job_run(get_config(), p), indent=2),
-    "stop_job_run_tool": lambda **p: json.dumps(stop_job_run(get_config(), p), indent=2),
-    
-    # Experiment operations
-    "create_experiment_tool": lambda **p: json.dumps(create_experiment(get_config(), p), indent=2),
-    "list_experiments_tool": lambda **p: json.dumps(list_experiments(get_config(), {
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    "get_experiment_tool": lambda **p: json.dumps(get_experiment(get_config(), p), indent=2),
-    "update_experiment_tool": lambda **p: json.dumps(update_experiment(get_config(), p), indent=2),
-    "delete_experiment_tool": lambda **p: json.dumps(delete_experiment(get_config(), p), indent=2),
-    
-    # Experiment run operations
-    "create_experiment_run_tool": lambda **p: json.dumps(create_experiment_run(get_config(), p), indent=2),
-    "get_experiment_run_tool": lambda **p: json.dumps(get_experiment_run(get_config(), p), indent=2),
-    "update_experiment_run_tool": lambda **p: json.dumps(update_experiment_run(get_config(), p), indent=2),
-    "delete_experiment_run_tool": lambda **p: json.dumps(delete_experiment_run(get_config(), p), indent=2),
-    "delete_experiment_run_batch_tool": lambda **p: json.dumps(delete_experiment_run_batch(get_config(), {
-        "experiment_id": p.get("experiment_id"),
-        "run_ids": [run_id.strip() for run_id in p.get("run_ids", "").split(",")],
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    "log_experiment_run_batch_tool": lambda **p: json.dumps(log_experiment_run_batch(get_config(), {
-        "experiment_id": p.get("experiment_id"),
-        "run_updates": json.loads(p.get("run_updates", "[]")),
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    
-    # Model operations
-    "create_model_build_tool": lambda **p: json.dumps(create_model_build(get_config(), p), indent=2),
-    "create_model_deployment_tool": lambda **p: json.dumps(create_model_deployment(get_config(), p), indent=2),
-    "list_models_tool": lambda **p: json.dumps(list_models(get_config(), {
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    "list_model_builds_tool": lambda **p: json.dumps(list_model_builds(get_config(), p), indent=2),
-    "list_model_deployments_tool": lambda **p: json.dumps(list_model_deployments(get_config(), p), indent=2),
-    "get_model_tool": lambda **p: json.dumps(get_model(get_config(), p), indent=2),
-    "get_model_build_tool": lambda **p: json.dumps(get_model_build(get_config(), p), indent=2),
-    "get_model_deployment_tool": lambda **p: json.dumps(get_model_deployment(get_config(), p), indent=2),
-    "stop_model_deployment_tool": lambda **p: json.dumps(stop_model_deployment(get_config(), p), indent=2),
-    "delete_model_tool": lambda **p: json.dumps(delete_model(get_config(), p), indent=2),
-    
-    # Application operations
-    "create_application_tool": lambda **p: json.dumps(create_application(get_config(), p), indent=2),
-    "list_applications_tool": lambda **p: json.dumps(list_applications(get_config(), {
-        "project_id": p.get("project_id", get_config().get("project_id", ""))
-    }), indent=2),
-    "get_application_tool": lambda **p: json.dumps(get_application(get_config(), p), indent=2),
-    "update_application_tool": lambda **p: json.dumps(update_application(get_config(), p), indent=2),
-    "restart_application_tool": lambda **p: json.dumps(restart_application(get_config(), p), indent=2),
-    "stop_application_tool": lambda **p: json.dumps(stop_application(get_config(), p), indent=2),
-    "delete_application_tool": lambda **p: json.dumps(delete_application(get_config(), p), indent=2),
-    
-    # File operations
-    "list_project_files_tool": lambda **p: json.dumps(list_project_files(get_config(), p), indent=2),
-    "delete_project_file_tool": lambda **p: json.dumps(delete_project_file(get_config(), p), indent=2),
-    "update_project_file_metadata_tool": lambda **p: json.dumps(update_project_file_metadata(get_config(), p), indent=2),
-}
+
+
+# --- Tools previously in TOOL_IMPLEMENTATIONS (now proper @mcp.tool) ---
+
+@mcp.tool()
+def upload_folder_tool(folder_path: str, ignore_folders: str = None, project_id: str = None) -> str:
+    """Upload a folder to Cloudera AI."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(upload_folder(config, {
+        "folder_path": folder_path,
+        "ignore_folders": ignore_folders.split(",") if ignore_folders else None
+    }), indent=2)
+
+@mcp.tool()
+def upload_file_tool(file_path: str, target_name: str = None, target_dir: str = None, project_id: str = None) -> str:
+    """Upload a single file to Cloudera AI."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(upload_file(config, {
+        "file_path": file_path, "target_name": target_name, "target_dir": target_dir
+    }), indent=2)
+
+@mcp.tool()
+def create_job_tool(name: str, script: str, kernel: str = "python3", cpu: int = 1, memory: int = 1, nvidia_gpu: int = 0, runtime_identifier: str = None, project_id: str = None) -> str:
+    """Create a new Cloudera AI job."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(create_job(config, {
+        "name": name, "script": script, "kernel": kernel,
+        "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu,
+        "runtime_identifier": runtime_identifier
+    }), indent=2)
+
+@mcp.tool()
+def list_jobs_tool(project_id: str = None) -> str:
+    """List all jobs in the Cloudera AI project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(list_jobs(config, {}), indent=2)
+
+@mcp.tool()
+def get_job_tool(job_id: str, project_id: str = None) -> str:
+    """Get details of a specific job."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_job(config, {"job_id": job_id}), indent=2)
+
+@mcp.tool()
+def update_job_tool(job_id: str, name: str = None, script: str = None, kernel: str = None, cpu: int = None, memory: int = None, nvidia_gpu: int = None, runtime_identifier: str = None, project_id: str = None) -> str:
+    """Update an existing job."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {"job_id": job_id}
+    for k, v in {"name": name, "script": script, "kernel": kernel, "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu, "runtime_identifier": runtime_identifier}.items():
+        if v is not None:
+            p[k] = v
+    return json.dumps(update_job(config, p), indent=2)
+
+@mcp.tool()
+def delete_job_tool(job_id: str, project_id: str = None) -> str:
+    """Delete a job by ID."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_job(config, {"job_id": job_id}), indent=2)
+
+@mcp.tool()
+def delete_all_jobs_tool(project_id: str = None) -> str:
+    """Delete all jobs in the project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_all_jobs(config, {}), indent=2)
+
+@mcp.tool()
+def get_project_id_tool(project_name: str) -> str:
+    """Get project ID from a project name. Use '*' to list all."""
+    config = get_config()
+    return json.dumps(get_project_id(config, {"project_name": project_name}), indent=2)
+
+@mcp.tool()
+def list_projects_tool() -> str:
+    """List all available projects."""
+    config = get_config()
+    return json.dumps(get_project_id(config, {"project_name": "*"}), indent=2)
+
+@mcp.tool()
+def create_job_run_tool(project_id: str, job_id: str, runtime_identifier: str = None, environment_variables: str = None, override_config: str = None) -> str:
+    """Create a run for an existing job."""
+    config = get_config()
+    return json.dumps(create_job_run(config, {
+        "project_id": project_id, "job_id": job_id,
+        "runtime_identifier": runtime_identifier,
+        "environment_variables": environment_variables,
+        "override_config": override_config
+    }), indent=2)
+
+@mcp.tool()
+def list_job_runs_tool(project_id: str = None, job_id: str = None) -> str:
+    """List job runs."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {}
+    if job_id:
+        p["job_id"] = job_id
+    return json.dumps(list_job_runs(config, p), indent=2)
+
+@mcp.tool()
+def get_job_run_tool(job_id: str, run_id: str, project_id: str = None) -> str:
+    """Get details of a job run."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_job_run(config, {"job_id": job_id, "run_id": run_id}), indent=2)
+
+@mcp.tool()
+def stop_job_run_tool(job_id: str, run_id: str, project_id: str = None) -> str:
+    """Stop a running job run."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(stop_job_run(config, {"job_id": job_id, "run_id": run_id}), indent=2)
+
+@mcp.tool()
+def create_experiment_tool(project_id: str, name: str, description: str = None) -> str:
+    """Create a new experiment."""
+    config = get_config()
+    return json.dumps(create_experiment(config, {"project_id": project_id, "name": name, "description": description}), indent=2)
+
+@mcp.tool()
+def list_experiments_tool(project_id: str = None) -> str:
+    """List experiments in a project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(list_experiments(config, {"project_id": project_id or config.get("project_id", "")}), indent=2)
+
+@mcp.tool()
+def get_experiment_tool(experiment_id: str, project_id: str = None) -> str:
+    """Get experiment details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_experiment(config, {"experiment_id": experiment_id}), indent=2)
+
+@mcp.tool()
+def update_experiment_tool(experiment_id: str, name: str = None, description: str = None, project_id: str = None) -> str:
+    """Update an experiment."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(update_experiment(config, {"experiment_id": experiment_id, "name": name, "description": description}), indent=2)
+
+@mcp.tool()
+def delete_experiment_tool(experiment_id: str, project_id: str = None) -> str:
+    """Delete an experiment."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_experiment(config, {"experiment_id": experiment_id}), indent=2)
+
+@mcp.tool()
+def create_experiment_run_tool(project_id: str, experiment_id: str, name: str = None, description: str = None, metrics: str = None, parameters: str = None, tags: str = None) -> str:
+    """Create an experiment run."""
+    config = get_config()
+    return json.dumps(create_experiment_run(config, {
+        "project_id": project_id, "experiment_id": experiment_id,
+        "name": name, "description": description, "metrics": metrics,
+        "parameters": parameters, "tags": tags
+    }), indent=2)
+
+@mcp.tool()
+def get_experiment_run_tool(experiment_id: str, run_id: str, project_id: str = None) -> str:
+    """Get experiment run details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_experiment_run(config, {"experiment_id": experiment_id, "run_id": run_id}), indent=2)
+
+@mcp.tool()
+def update_experiment_run_tool(experiment_id: str, run_id: str, name: str = None, description: str = None, metrics: str = None, parameters: str = None, tags: str = None, project_id: str = None) -> str:
+    """Update an experiment run."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(update_experiment_run(config, {
+        "experiment_id": experiment_id, "run_id": run_id,
+        "name": name, "description": description, "metrics": metrics,
+        "parameters": parameters, "tags": tags
+    }), indent=2)
+
+@mcp.tool()
+def delete_experiment_run_tool(experiment_id: str, run_id: str, project_id: str = None) -> str:
+    """Delete an experiment run."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_experiment_run(config, {"experiment_id": experiment_id, "run_id": run_id}), indent=2)
+
+@mcp.tool()
+def delete_experiment_run_batch_tool(experiment_id: str, run_ids: str, project_id: str = None) -> str:
+    """Delete multiple experiment runs."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_experiment_run_batch(config, {"experiment_id": experiment_id, "run_ids": run_ids}), indent=2)
+
+@mcp.tool()
+def log_experiment_run_batch_tool(experiment_id: str, run_updates: str, project_id: str = None) -> str:
+    """Log metrics/params for multiple experiment runs."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(log_experiment_run_batch(config, {"experiment_id": experiment_id, "run_updates": run_updates}), indent=2)
+
+@mcp.tool()
+def create_model_build_tool(project_id: str, model_id: str, file_path: str, function_name: str, kernel: str = "python3", runtime_identifier: str = None, cpu: int = 1, memory: int = 2, nvidia_gpu: int = 0) -> str:
+    """Create a new model build."""
+    config = get_config()
+    return json.dumps(create_model_build(config, {
+        "project_id": project_id, "model_id": model_id,
+        "file_path": file_path, "function_name": function_name,
+        "kernel": kernel, "runtime_identifier": runtime_identifier,
+        "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu
+    }), indent=2)
+
+@mcp.tool()
+def create_model_deployment_tool(project_id: str, model_id: str, build_id: str, name: str, cpu: int = 1, memory: int = 2, nvidia_gpu: int = 0, replica_count: int = 1) -> str:
+    """Create a new model deployment."""
+    config = get_config()
+    return json.dumps(create_model_deployment(config, {
+        "project_id": project_id, "model_id": model_id, "build_id": build_id,
+        "name": name, "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu,
+        "replica_count": replica_count
+    }), indent=2)
+
+@mcp.tool()
+def list_models_tool(project_id: str = None) -> str:
+    """List models in a project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(list_models(config, {}), indent=2)
+
+@mcp.tool()
+def list_model_builds_tool(project_id: str = None, model_id: str = None) -> str:
+    """List model builds."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {}
+    if model_id:
+        p["model_id"] = model_id
+    return json.dumps(list_model_builds(config, p), indent=2)
+
+@mcp.tool()
+def list_model_deployments_tool(project_id: str = None, model_id: str = None) -> str:
+    """List model deployments."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {}
+    if model_id:
+        p["model_id"] = model_id
+    return json.dumps(list_model_deployments(config, p), indent=2)
+
+@mcp.tool()
+def get_model_tool(model_id: str, project_id: str = None) -> str:
+    """Get model details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_model(config, {"model_id": model_id}), indent=2)
+
+@mcp.tool()
+def get_model_build_tool(model_id: str, build_id: str, project_id: str = None) -> str:
+    """Get model build details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_model_build(config, {"model_id": model_id, "build_id": build_id}), indent=2)
+
+@mcp.tool()
+def get_model_deployment_tool(model_id: str, deployment_id: str, project_id: str = None) -> str:
+    """Get model deployment details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_model_deployment(config, {"model_id": model_id, "deployment_id": deployment_id}), indent=2)
+
+@mcp.tool()
+def stop_model_deployment_tool(model_id: str, deployment_id: str, project_id: str = None) -> str:
+    """Stop a model deployment."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(stop_model_deployment(config, {"model_id": model_id, "deployment_id": deployment_id}), indent=2)
+
+@mcp.tool()
+def delete_model_tool(model_id: str, project_id: str = None) -> str:
+    """Delete a model."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_model(config, {"model_id": model_id}), indent=2)
+
+@mcp.tool()
+def create_application_tool(project_id: str, name: str, script: str, cpu: int = 1, memory: int = 1, nvidia_gpu: int = 0, runtime_identifier: str = None, subdomain: str = None) -> str:
+    """Create a new application."""
+    config = get_config()
+    return json.dumps(create_application(config, {
+        "project_id": project_id, "name": name, "script": script,
+        "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu,
+        "runtime_identifier": runtime_identifier, "subdomain": subdomain
+    }), indent=2)
+
+@mcp.tool()
+def list_applications_tool(project_id: str = None) -> str:
+    """List applications in a project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(list_applications(config, {}), indent=2)
+
+@mcp.tool()
+def get_application_tool(application_id: str, project_id: str = None) -> str:
+    """Get application details."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(get_application(config, {"application_id": application_id}), indent=2)
+
+@mcp.tool()
+def update_application_tool(application_id: str, name: str = None, script: str = None, cpu: int = None, memory: int = None, nvidia_gpu: int = None, runtime_identifier: str = None, project_id: str = None) -> str:
+    """Update an application."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {"application_id": application_id}
+    for k, v in {"name": name, "script": script, "cpu": cpu, "memory": memory, "nvidia_gpu": nvidia_gpu, "runtime_identifier": runtime_identifier}.items():
+        if v is not None:
+            p[k] = v
+    return json.dumps(update_application(config, p), indent=2)
+
+@mcp.tool()
+def restart_application_tool(application_id: str, project_id: str = None) -> str:
+    """Restart an application."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(restart_application(config, {"application_id": application_id}), indent=2)
+
+@mcp.tool()
+def stop_application_tool(application_id: str, project_id: str = None) -> str:
+    """Stop an application."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(stop_application(config, {"application_id": application_id}), indent=2)
+
+@mcp.tool()
+def delete_application_tool(application_id: str, project_id: str = None) -> str:
+    """Delete an application."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_application(config, {"application_id": application_id}), indent=2)
+
+@mcp.tool()
+def list_project_files_tool(project_id: str, path: str = "") -> str:
+    """List files in a project."""
+    config = get_config()
+    return json.dumps(list_project_files(config, {"project_id": project_id, "path": path}), indent=2)
+
+@mcp.tool()
+def delete_project_file_tool(file_path: str, project_id: str = None) -> str:
+    """Delete a file from a project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(delete_project_file(config, {"file_path": file_path}), indent=2)
+
+@mcp.tool()
+def update_project_file_metadata_tool(file_path: str, description: str = None, hidden: bool = None, project_id: str = None) -> str:
+    """Update file metadata."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    return json.dumps(update_project_file_metadata(config, {"file_path": file_path, "description": description, "hidden": hidden}), indent=2)
+
+@mcp.tool()
+def update_project_tool(project_id: str = None, name: str = None, summary: str = None, template: str = None, public: bool = None, disable_git_repo: bool = None) -> str:
+    """Update a project."""
+    config = get_config()
+    if project_id:
+        config["project_id"] = project_id
+    p = {}
+    for k, v in {"name": name, "summary": summary, "template": template, "public": public, "disable_git_repo": disable_git_repo}.items():
+        if v is not None:
+            p[k] = v
+    return json.dumps(update_project(config, p), indent=2)
 
 
 @mcp.custom_route("/mcp-api", methods=["POST"])
@@ -272,25 +592,6 @@ async def mcp_protocol_endpoint(request):
             tool_name = params.get("name")
             arguments = params.get("arguments", {})
 
-            # Try TOOL_IMPLEMENTATIONS first (legacy mapping)
-            impl_func = TOOL_IMPLEMENTATIONS.get(tool_name)
-
-            if impl_func:
-                try:
-                    result = impl_func(**arguments)
-                    return JSONResponse({
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "result": {"content": [{"type": "text", "text": str(result)}], "isError": False}
-                    })
-                except Exception as e:
-                    return JSONResponse({
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "result": {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
-                    })
-
-            # Fall through to FastMCP's native tool calling
             tools_dict = await mcp.get_tools()
             tool = tools_dict.get(tool_name)
             if not tool:
@@ -338,7 +639,7 @@ async def test_endpoint(request):
         "message": "Cloudera AI HTTP Server is running",
         "transport": "http",
         "endpoint": "/mcp-api",
-        "tools_available": len(TOOL_IMPLEMENTATIONS)
+        "tools_available": len(mcp._tool_manager._tools)
     })
 
 
@@ -348,8 +649,8 @@ async def debug_list_tools(request):
     from starlette.responses import JSONResponse
     return JSONResponse({
         "status": "ok",
-        "tools_count": len(TOOL_IMPLEMENTATIONS),
-        "tools": list(TOOL_IMPLEMENTATIONS.keys())
+        "tools_count": len(mcp._tool_manager._tools),
+        "tools": list((mcp._tool_manager._tools or {}).keys())
     })
 
 
@@ -369,7 +670,7 @@ async def debug_call_tool(request):
             return JSONResponse({
                 "status": "error",
                 "message": f"Tool '{tool_name}' not found",
-                "available_tools": list(TOOL_IMPLEMENTATIONS.keys())[:10]
+                "available_tools": list((mcp._tool_manager._tools or {}).keys())[:10]
             }, status_code=404)
         
         result = impl_func(**params)
@@ -1184,7 +1485,7 @@ def main():
     
     print("Starting Cloudera AI HTTP Server...")
     print(f"Connected to: {config['host']}")
-    print(f"Tools available: {len(TOOL_IMPLEMENTATIONS)}")
+    print(f"Tools available: {len(mcp._tool_manager._tools)}")
     print(f"Server will start on {host}:{port}")
     print("")
     print("Endpoints:")

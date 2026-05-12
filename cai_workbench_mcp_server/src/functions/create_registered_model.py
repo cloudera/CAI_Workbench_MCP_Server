@@ -41,8 +41,14 @@ def create_registered_model(config: Dict[str, str], params: Dict[str, Any]) -> D
                 tags = json.loads(tags)
             except json.JSONDecodeError:
                 return {"success": False, "message": "tags must be a JSON array string, e.g. '[{\"key\":\"k\",\"value\":\"v\"}]'"}
-        # Convert dicts to cmlapi.Tag objects
-        body.tags = [cmlapi.Tag(key=t["key"], value=t["value"]) for t in tags]
+        # Convert to cmlapi.Tag objects
+        tag_objects = []
+        for t in tags:
+            if isinstance(t, dict):
+                tag_objects.append(cmlapi.Tag(key=t.get("key", ""), value=t.get("value", "")))
+            else:
+                tag_objects.append(cmlapi.Tag(key=str(t), value=""))
+        body.tags = tag_objects
 
     try:
         client = setup_client(config["host"], config["api_key"])

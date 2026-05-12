@@ -16,7 +16,7 @@ def config():
 
 
 def test_create_registered_model_parses_tags_json_string(config):
-    """MCP passes tags as a string; verify it gets parsed to a list in the body."""
+    """MCP passes tags as a JSON array string; verify it gets parsed."""
     mock_client = MagicMock()
     mock_result = MagicMock()
     mock_result.to_dict.return_value = {"model_id": "mid", "name": "m"}
@@ -28,7 +28,7 @@ def test_create_registered_model_parses_tags_json_string(config):
         "run_id": "r1",
         "model_path": "model",
         "model_name": "test-model",
-        "tags": "tag1,tag2",
+        "tags": '[{"key": "env", "value": "prod"}]',
     }
 
     with patch("cai_workbench_mcp_server.src.functions.create_registered_model.setup_client", return_value=mock_client):
@@ -36,16 +36,11 @@ def test_create_registered_model_parses_tags_json_string(config):
 
     assert result["success"] is True
     call_body = mock_client.create_registered_model.call_args[0][0]
-    assert call_body["tags"] == ["tag1", "tag2"]
+    assert len(call_body.tags) == 1
 
 
 def test_create_registered_model_invalid_tags_string_returns_error(config):
-    """When tags is a comma-separated string, it should split properly."""
-    mock_client = MagicMock()
-    mock_result = MagicMock()
-    mock_result.to_dict.return_value = {}
-    mock_client.create_registered_model.return_value = mock_result
-
+    """Non-JSON tags string should return error."""
     params = {
         "project_id": "p1",
         "experiment_id": "e1",
@@ -55,23 +50,19 @@ def test_create_registered_model_invalid_tags_string_returns_error(config):
         "tags": "not-json",
     }
 
-    with patch("cai_workbench_mcp_server.src.functions.create_registered_model.setup_client", return_value=mock_client):
-        result = create_registered_model(config, params)
-
-    # With cmlapi refactor, tags string gets split by comma
-    assert result["success"] is True
-    call_body = mock_client.create_registered_model.call_args[0][0]
-    assert call_body["tags"] == ["not-json"]
+    result = create_registered_model(config, params)
+    assert result["success"] is False
+    assert "JSON array" in result["message"]
 
 
 def test_create_registered_model_accepts_list_tags(config):
-    """Non-string tags are forwarded as-is."""
+    """List of dicts forwarded as Tag objects."""
     mock_client = MagicMock()
     mock_result = MagicMock()
     mock_result.to_dict.return_value = {}
     mock_client.create_registered_model.return_value = mock_result
 
-    tags = ["a", "b"]
+    tags = [{"key": "a", "value": "b"}, {"key": "c", "value": "d"}]
     params = {
         "project_id": "p1",
         "experiment_id": "e1",
@@ -86,4 +77,4 @@ def test_create_registered_model_accepts_list_tags(config):
 
     assert result["success"] is True
     call_body = mock_client.create_registered_model.call_args[0][0]
-    assert call_body["tags"] == tags
+    assert len(call_body.tags) == 2

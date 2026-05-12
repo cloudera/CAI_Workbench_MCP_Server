@@ -63,7 +63,7 @@ def test_list_project_files_uses_cmlapi():
         result = list_project_files(config, {"project_id": "p1", "path": "/dir with spaces/app.py"})
 
     assert result["success"] is True
-    mock_client.list_project_files.assert_called_once_with("p1", path="/dir with spaces/app.py")
+    mock_client.list_project_files.assert_called_once_with("p1", "/dir with spaces/app.py")
 
 
 def test_delete_project_file_calls_cmlapi():
