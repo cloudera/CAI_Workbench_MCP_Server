@@ -26,7 +26,7 @@ try:
     from .src.functions.delete_job import delete_job
     from .src.functions.delete_all_jobs import delete_all_jobs
     from .src.functions.get_project_id import get_project_id
-    from .src.functions.get_runtimes import get_runtimes
+
     from .src.functions.create_job_run import create_job_run
     from .src.functions.create_experiment import create_experiment
     from .src.functions.create_experiment_run import create_experiment_run
@@ -132,7 +132,7 @@ except ImportError:
     from src.functions.delete_job import delete_job
     from src.functions.delete_all_jobs import delete_all_jobs
     from src.functions.get_project_id import get_project_id
-    from src.functions.get_runtimes import get_runtimes
+
     from src.functions.create_job_run import create_job_run
     from src.functions.create_experiment import create_experiment
     from src.functions.create_experiment_run import create_experiment_run
@@ -761,18 +761,6 @@ def update_project_tool(name: str = None, summary: str = None, template: str = N
     result = update_project(config, params)
     return json.dumps(result, indent=2)
 
-# System Information
-@mcp.tool()
-def get_runtimes_tool() -> str:
-    """
-    Get available runtimes from Cloudera AI.
-    
-    Returns:
-        JSON string with list of available runtimes and their details
-    """
-    config = get_config()
-    result = get_runtimes(config, {})
-    return json.dumps(result, indent=2)
 
 # Experiment Tracking
 @mcp.tool()
@@ -1466,18 +1454,19 @@ def stop_model_deployment_tool(model_id: str, deployment_id: str, project_id: st
 
 # Application Management
 @mcp.tool()
-def create_application_tool(project_id: str, name: str, subdomain: str, 
+def create_application_tool(project_id: str, name: str,
+                           subdomain: str = None,
                            script: str = None, kernel: str = "python3",
                            cpu: int = 1, memory: int = 1, nvidia_gpu: int = 0,
-                           runtime_identifier: str = None, 
+                           runtime_identifier: str = None,
                            environment_variables: str = None) -> str:
     """
     Create a new application in Cloudera AI.
-    
+
     Args:
         project_id: ID of the project
         name: Name of the application
-        subdomain: Subdomain for the application URL
+        subdomain: Subdomain for the application URL (optional, auto-generated from name if not provided)
         script: Script path relative to project root (optional)
         kernel: Kernel type (default: python3)
         cpu: CPU cores (default: 1)
@@ -1485,21 +1474,23 @@ def create_application_tool(project_id: str, name: str, subdomain: str,
         nvidia_gpu: Number of GPUs (default: 0)
         runtime_identifier: Runtime environment identifier (optional)
         environment_variables: JSON string with environment variables (optional)
-    
+
     Returns:
         JSON string with application creation result
     """
     config = get_config()
-    
+
     params = {
         "project_id": project_id,
         "name": name,
-        "subdomain": subdomain,
         "kernel": kernel,
         "cpu": cpu,
         "memory": memory,
         "nvidia_gpu": nvidia_gpu
     }
+
+    if subdomain:
+        params["subdomain"] = subdomain
     
     if script:
         params["script"] = script
@@ -2209,7 +2200,13 @@ def delete_registered_model_version_tool(model_id: str, version_id: str) -> str:
 def list_runtimes_tool(
     search_filter: str = None, sort: str = None, page_size: int = None, page_token: str = None
 ) -> str:
-    """List runtimes (raw API v2). Optional: search_filter, sort, page_size, page_token."""
+    """
+    List available runtimes in Cloudera AI. Use search_filter to find ENABLED runtimes.
+
+    To get only active/usable runtimes, pass: search_filter={"status":"ENABLED"}
+    Supports pagination via page_size and page_token. Returns image_identifier,
+    editor, kernel, edition, full_version, and status for each runtime.
+    """
     p = {}
     if search_filter is not None:
         p["search_filter"] = search_filter

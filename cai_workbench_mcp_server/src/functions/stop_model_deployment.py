@@ -1,7 +1,6 @@
 """Function to stop a model deployment in a Cloudera AI project."""
 
 import json
-import os
 import requests
 from urllib.parse import urlparse
 
@@ -15,6 +14,8 @@ def stop_model_deployment(config, params=None):
         params (dict, optional): Parameters for the API call. Default is None.
             - project_id (str, optional): ID of the project.
                 If not provided, it will be taken from the configuration.
+            - model_id (str): ID of the model containing the deployment.
+            - build_id (str): ID of the build containing the deployment.
             - deployment_id (str): ID of the model deployment to stop.
 
     Returns:
@@ -27,12 +28,28 @@ def stop_model_deployment(config, params=None):
     """
     params = params or {}
     project_id = params.get('project_id') or config.get('project_id')
+    model_id = params.get('model_id')
+    build_id = params.get('build_id')
     deployment_id = params.get('deployment_id')
 
     if not project_id:
         return {
             "success": False,
             "message": "project_id is required either in config or params",
+            "data": None
+        }
+
+    if not model_id:
+        return {
+            "success": False,
+            "message": "model_id is required in params",
+            "data": None
+        }
+
+    if not build_id:
+        return {
+            "success": False,
+            "message": "build_id is required in params",
             "data": None
         }
 
@@ -62,9 +79,7 @@ def stop_model_deployment(config, params=None):
     host = host.rstrip('/')
 
     # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/model-deployments/{deployment_id}/stop"
-    
-    print(f"Accessing: {url}")
+    url = f"{host}/api/v2/projects/{project_id}/models/{model_id}/builds/{build_id}/deployments/{deployment_id}:stop"
 
     # Setup headers
     headers = {
@@ -79,7 +94,7 @@ def stop_model_deployment(config, params=None):
         if response.status_code >= 400:
             return {
                 "success": False,
-                "message": f"Failed to execute request: HTTP {response.status_code}",
+                "message": f"Failed to stop model deployment: HTTP {response.status_code} - {response.text}",
                 "data": None
             }
 
@@ -102,9 +117,3 @@ def stop_model_deployment(config, params=None):
             "message": f"Failed to execute request: {str(e)}",
             "data": None
         }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": f"An unexpected error occurred: {str(e)}",
-            "data": None
-        } 

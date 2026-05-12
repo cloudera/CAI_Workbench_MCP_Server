@@ -62,7 +62,7 @@ def stop_application(config, params=None):
     host = host.rstrip('/')
 
     # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/applications/{application_id}/stop"
+    url = f"{host}/api/v2/projects/{project_id}/applications/{application_id}:stop"
     
     print(f"Accessing: {url}")
 
