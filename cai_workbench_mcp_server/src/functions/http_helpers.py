@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
-import cmlapi
 import requests
 
 
@@ -18,7 +17,7 @@ def normalize_host(host: str) -> str:
     return h.rstrip("/")
 
 
-def setup_client(host: str, api_key: str) -> cmlapi.CMLServiceApi:
+def setup_client(host: str, api_key: str):
     """Create a configured cmlapi client.
 
     Args:
@@ -28,6 +27,7 @@ def setup_client(host: str, api_key: str) -> cmlapi.CMLServiceApi:
     Returns:
         Ready-to-use CMLServiceApi instance.
     """
+    import cmlapi
     config = cmlapi.Configuration()
     config.host = normalize_host(host)
     api_client = cmlapi.ApiClient(config)

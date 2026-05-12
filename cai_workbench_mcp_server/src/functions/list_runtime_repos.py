@@ -1,7 +1,10 @@
 """Cloudera AI: list_runtime_repos."""
 
 from typing import Any, Dict
-from cmlapi.rest import ApiException
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    ApiException = Exception
 from .http_helpers import setup_client, serialize_result
 
 def list_runtime_repos(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,7 +1,10 @@
 """Cloudera AI: list_docker_credentials."""
 
 from typing import Any, Dict
-from cmlapi.rest import ApiException
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    ApiException = Exception
 from .http_helpers import setup_client, serialize_result
 
 def list_docker_credentials(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
