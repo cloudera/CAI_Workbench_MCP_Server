@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 from cmlapi.rest import ApiException
 
-from .http_helpers import setup_client
+from .http_helpers import setup_client, serialize_result
 
 
 def restart_application(config: Dict[str, str], params: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -35,7 +35,7 @@ def restart_application(config: Dict[str, str], params: Dict[str, Any] = None) -
         return {
             "success": True,
             "message": f"Successfully restarted application {application_id}",
-            "data": result.to_dict() if hasattr(result, "to_dict") else result,
+            "data": serialize_result(result),
         }
     except ApiException as e:
         return {"success": False, "message": f"API error: {e.status} - {e.body}", "data": None}

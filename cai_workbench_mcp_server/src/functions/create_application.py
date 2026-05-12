@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from cmlapi.rest import ApiException
 
-from .http_helpers import setup_client
+from .http_helpers import setup_client, serialize_result
 
 
 def create_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
@@ -64,7 +64,7 @@ def create_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[s
         return {
             "success": True,
             "message": f"Successfully created application '{params['name']}'",
-            "data": result.to_dict() if hasattr(result, "to_dict") else result,
+            "data": serialize_result(result),
         }
     except ApiException as e:
         return {"success": False, "message": f"API error: {e.status} - {e.body}"}

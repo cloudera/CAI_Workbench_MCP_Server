@@ -35,6 +35,15 @@ def setup_client(host: str, api_key: str) -> cmlapi.CMLServiceApi:
     return cmlapi.CMLServiceApi(api_client)
 
 
+def serialize_result(result) -> Any:
+    """Convert a cmlapi response object to a JSON-safe dict."""
+    if result is None:
+        return None
+    raw = result.to_dict() if hasattr(result, "to_dict") else result
+    # Round-trip through JSON to handle datetime and other non-serializable types
+    return json.loads(json.dumps(raw, default=str))
+
+
 def auth_headers(api_key: str) -> Dict[str, str]:
     return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
