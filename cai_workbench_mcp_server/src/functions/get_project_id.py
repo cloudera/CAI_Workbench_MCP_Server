@@ -49,16 +49,19 @@ def get_project_id(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, 
 
         # The v2 API defaults page_size to 10. Paginate so project lookup and
         # list-all behavior do not silently miss projects beyond the first page.
+        page_size = 200
+        pages_fetched = 0
         all_projects = []
         page_token = ""
         while True:
-            request_params = {"page_size": 200}
+            request_params = {"page_size": page_size}
             if page_token:
                 request_params["page_token"] = page_token
 
             response = requests.get(url, headers=headers, params=request_params, timeout=60)
             response.raise_for_status()
             page = response.json()
+            pages_fetched += 1
             all_projects.extend(page.get("projects") or [])
 
             page_token = page.get("next_page_token") or ""
@@ -81,7 +84,9 @@ def get_project_id(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, 
                 return {
                     "status": "success",
                     "projects": projects_list,
-                    "count": len(projects_list)
+                    "count": len(projects_list),
+                    "page_size": page_size,
+                    "pages_fetched": pages_fetched,
                 }
             else:
                 return {

@@ -32,6 +32,23 @@ def test_get_project_id_paginates_all_projects():
     assert calls == [{"page_size": 200}, {"page_size": 200, "page_token": "next"}]
 
 
+def test_get_project_id_list_all_reports_pagination_metadata():
+    config = {"host": "https://ml.example", "api_key": "token"}
+
+    def fake_get(url, headers=None, params=None, timeout=None):
+        response = MagicMock()
+        response.raise_for_status = MagicMock()
+        response.json = MagicMock(return_value={"projects": [{"name": "first", "id": "p1"}]})
+        return response
+
+    with patch("cai_workbench_mcp_server.src.functions.get_project_id.requests.get", fake_get):
+        result = get_project_id(config, {"project_name": "*"})
+
+    assert result["status"] == "success"
+    assert result["page_size"] == 200
+    assert result["pages_fetched"] == 1
+
+
 def test_list_project_files_uses_url_segment_for_subdirectory():
     config = {"host": "https://ml.example", "api_key": "token"}
     captured = {}
