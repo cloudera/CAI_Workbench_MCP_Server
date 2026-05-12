@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
+import cmlapi
 import requests
 
 
@@ -15,6 +16,23 @@ def normalize_host(host: str) -> str:
     if not h.startswith(("http://", "https://")):
         h = "https://" + h
     return h.rstrip("/")
+
+
+def setup_client(host: str, api_key: str) -> cmlapi.CMLServiceApi:
+    """Create a configured cmlapi client.
+
+    Args:
+        host: CAI Workbench host URL (raw — will be normalized).
+        api_key: Bearer token for authentication.
+
+    Returns:
+        Ready-to-use CMLServiceApi instance.
+    """
+    config = cmlapi.Configuration()
+    config.host = normalize_host(host)
+    api_client = cmlapi.ApiClient(config)
+    api_client.set_default_header("authorization", f"Bearer {api_key}")
+    return cmlapi.CMLServiceApi(api_client)
 
 
 def auth_headers(api_key: str) -> Dict[str, str]:

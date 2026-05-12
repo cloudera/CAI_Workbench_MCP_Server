@@ -1,134 +1,72 @@
-"""Create application function for Cloudera AI Workbench MCP"""
+"""Create an application in a Cloudera AI project."""
 
 import re
-import requests
-import json
-from typing import Dict, Any
+from typing import Any, Dict
+
+from cmlapi.rest import ApiException
+
+from .http_helpers import setup_client
 
 
 def create_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Create a new application in a Cloudera AI project
-    
+    Create a new application in a Cloudera AI project.
+
     Args:
         config: MCP configuration with host and api_key
-        params: Function parameters
+        params: Parameters for the API call:
             - project_id: ID of the project (required)
             - name: Name of the application (required)
-            - description: Description of the application (optional)
-            - script: Script to run in the application (required)
-            - cpu: CPU cores (optional, default: 1)
-            - memory: Memory in GB (optional, default: 1)
-            - nvidia_gpu: Number of GPUs (optional, default: 0)
+            - script: Script to run (required)
+            - description: Description (optional)
+            - subdomain: Subdomain (optional, auto-generated from name if omitted)
+            - cpu: CPU cores (optional, default 1)
+            - memory: Memory in GB (optional, default 1)
+            - nvidia_gpu: Number of GPUs (optional, default 0)
             - runtime_identifier: Runtime identifier (optional)
-            - environment_variables: Environment variables as dict (optional)
-        
+            - environment_variables: Env vars dict (optional)
+
     Returns:
-        Application creation results
+        Dict with success flag, message, and data
     """
+    required_params = ["project_id", "name", "script"]
+    missing = [p for p in required_params if not params.get(p)]
+    if missing:
+        return {"success": False, "message": f"Missing required parameters: {', '.join(missing)}"}
+
+    project_id = params["project_id"]
+
+    # Build the create body
+    body = {
+        "name": params["name"],
+        "script": params["script"],
+        "cpu": params.get("cpu", 1),
+        "memory": params.get("memory", 1),
+        "nvidia_gpu": params.get("nvidia_gpu", 0),
+    }
+
+    # Subdomain: use provided or auto-generate from name
+    if params.get("subdomain"):
+        body["subdomain"] = params["subdomain"]
+    else:
+        subdomain = re.sub(r"[^a-z0-9-]", "", params["name"].lower().replace(" ", "-"))
+        subdomain = re.sub(r"-+", "-", subdomain).strip("-")
+        if subdomain:
+            body["subdomain"] = subdomain
+
+    for key in ("description", "runtime_identifier", "environment_variables"):
+        if params.get(key):
+            body[key] = params[key]
+
     try:
-        # Validate required parameters
-        required_params = ["project_id", "name", "script"]
-        missing_params = [p for p in required_params if p not in params or not params[p]]
-        if missing_params:
-            return {"success": False, "message": f"Missing required parameters: {', '.join(missing_params)}"}
-            
-        # Format host URL correctly
-        host = config.get("host", "").strip()
-        # Remove duplicate https:// if present
-        if host.startswith("https://https://"):
-            host = host.replace("https://https://", "https://")
-        # Ensure URL has a scheme
-        if not host.startswith(("http://", "https://")):
-            host = "https://" + host
-        # Remove trailing slash if present
-        host = host.rstrip("/")
-        
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-            
-        # Prepare request payload
-        payload = {
-            "name": params["name"],
-            "script": params["script"],
-        }
-        if "subdomain" in params and params["subdomain"]:
-            payload["subdomain"] = params["subdomain"]
-        else:
-            # Auto-generate subdomain from application name
-            subdomain = re.sub(r'[^a-z0-9-]', '', params["name"].lower().replace(' ', '-'))
-            subdomain = re.sub(r'-+', '-', subdomain).strip('-')
-            if subdomain:
-                payload["subdomain"] = subdomain
-        
-        # Add optional parameters
-        if "description" in params:
-            payload["description"] = params["description"]
-        
-        if "cpu" in params:
-            payload["cpu"] = params["cpu"]
-        else:
-            payload["cpu"] = 1
-            
-        if "memory" in params:
-            payload["memory"] = params["memory"]
-        else:
-            payload["memory"] = 1
-            
-        if "nvidia_gpu" in params:
-            payload["nvidia_gpu"] = params["nvidia_gpu"]
-        else:
-            payload["nvidia_gpu"] = 0
-            
-        if "runtime_identifier" in params:
-            payload["runtime_identifier"] = params["runtime_identifier"]
-            
-        if "environment_variables" in params and params["environment_variables"]:
-            payload["environment_variables"] = params["environment_variables"]
-            
-        # Build the URL for the POST request
-        project_id = params["project_id"]
-        api_url = f"{host}/api/v2/projects/{project_id}/applications"
-        print(f"Creating application with URL: {api_url}")
-        print(f"Application payload: {json.dumps(payload, indent=2)}")
-        
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Make the request
-        response = requests.post(api_url, headers=headers, json=payload)
-        response.raise_for_status()
-        
-        # Parse the response
-        application_data = response.json()
-        
+        client = setup_client(config["host"], config["api_key"])
+        result = client.create_application(body, project_id)
         return {
             "success": True,
             "message": f"Successfully created application '{params['name']}'",
-            "data": application_data
+            "data": result.to_dict() if hasattr(result, "to_dict") else result,
         }
-        
-    except requests.exceptions.RequestException as e:
-        error_message = str(e)
-        response_body = ""
-        if hasattr(e, 'response') and e.response is not None:
-            try:
-                response_body = e.response.json()
-                error_message = f"{error_message} - {json.dumps(response_body)}"
-            except:
-                if hasattr(e.response, 'text'):
-                    response_body = e.response.text
-                    error_message = f"{error_message} - {response_body}"
-        
-        return {
-            "success": False,
-            "message": f"API request error: {error_message}"
-        }
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error creating application: {str(e)}"
-        } 
+        return {"success": False, "message": f"Error creating application: {str(e)}"}
