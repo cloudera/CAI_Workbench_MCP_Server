@@ -53,12 +53,54 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
 }
 ```
 
-3. **Set environment variables** in Agent Studio settings:
+3. **(Optional) Pin `uvx` to a branch, tag, or commit** — append `@ref` to the Git URL (pip / PEP 440 VCS URL syntax; `uvx --from git+…` follows the same rules):
+
+```json
+{
+  "mcpServers": {
+    "cloudera-ai": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git@your-branch-name",
+        "cai-workbench-mcp-stdio"
+      ],
+      "env": {
+        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
+        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
+        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
+      }
+    }
+  }
+}
+```
+
+| Target | Example suffix on the repo URL |
+|--------|----------------------------------|
+| Branch | `...git@feature/my-branch` |
+| Tag | `...git@v1.2.3` |
+| Commit SHA | `...git@a1b2c3d4` |
+
+**`uvx` caches aggressively.** If you iterate on a branch, you may get a stale install. Force a fresh pull:
+
+```bash
+uvx --no-cache --from "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git@your-branch-name" cai-workbench-mcp-stdio
+```
+
+Or clear the cache:
+
+```bash
+uv cache clean
+```
+
+This matters when testing unreleased server-side or MCP changes on a dev branch—cached wheels can look like “wrong” behavior.
+
+4. **Set environment variables** in Agent Studio settings:
    - `CAI_WORKBENCH_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
    - `CAI_WORKBENCH_API_KEY`: Your API key from Cloudera AI
    - `CAI_WORKBENCH_PROJECT_ID`: Your default project ID (optional)
 
-4. **Save and test** - Your agent now has access to all **105** Cloudera AI workbench tools (use MCP `tools/list` for the current list).
+5. **Save and test** - Your agent now has access to all **105** Cloudera AI workbench tools (use MCP `tools/list` for the current list).
 
 
 
@@ -110,6 +152,34 @@ export CAI_WORKBENCH_API_KEY="your-api-key"
 # Optional  
 export CAI_WORKBENCH_PROJECT_ID="your-default-project-id"
 ```
+
+#### 4. Cursor / Claude Desktop `mcp.json` — local checkout (feature branch)
+
+Use this when you develop from a clone and want the server to run **from your working tree** (any branch, e.g. `update-tools-DSE-54632`). Replace the path with the **absolute** path to your repo.
+
+```json
+{
+  "mcpServers": {
+    "cai-workbench-local": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/ABSOLUTE/PATH/TO/CAI_Workbench_MCP_Server",
+        "-m",
+        "cai_workbench_mcp_server.stdio_server"
+      ],
+      "env": {
+        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
+        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
+        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
+      }
+    }
+  }
+}
+```
+
+Run `uv sync` (and `uv sync --group dev` if you use dev tools) in that directory once so the environment exists. Switch branches in the clone as needed; restart the MCP server after you pull or change code. For **`uvx` from Git** (no clone), use the **`@branch` / `@tag` / `@commit`** form in **Option 1** above.
 
 ## Usage
 

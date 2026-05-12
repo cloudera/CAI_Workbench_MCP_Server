@@ -20,7 +20,6 @@ from .src.functions.list_jobs import list_jobs
 from .src.functions.delete_job import delete_job
 from .src.functions.delete_all_jobs import delete_all_jobs
 from .src.functions.get_project_id import get_project_id
-from .src.functions.get_runtimes import get_runtimes
 from .src.functions.create_job_run import create_job_run
 from .src.functions.create_experiment import create_experiment
 from .src.functions.create_experiment_run import create_experiment_run
@@ -139,7 +138,7 @@ def get_config() -> Dict[str, str]:
 # Initialize FastMCP server for HTTP
 mcp = FastMCP("cloudera-ml-http")
 
-# Complete tool implementations mapping - EXACTLY as it was working before
+# Complete tool implementations mapping 
 TOOL_IMPLEMENTATIONS = {
     # File operations
     "upload_folder_tool": lambda **p: json.dumps(upload_folder(get_config(), {
@@ -167,10 +166,7 @@ TOOL_IMPLEMENTATIONS = {
     "get_project_id_tool": lambda **p: json.dumps(get_project_id(get_config(), {"project_name": p.get("project_name")}), indent=2),
     "list_projects_tool": lambda **p: json.dumps(get_project_id(get_config(), {"project_name": "*"}), indent=2),
     "update_project_tool": lambda **p: json.dumps(update_project(get_config(), p), indent=2),
-    
-    # Runtime operations
-    "get_runtimes_tool": lambda **p: json.dumps(get_runtimes(get_config(), {}), indent=2),
-    
+
     # Job run operations
     "create_job_run_tool": lambda **p: json.dumps(create_job_run(get_config(), p), indent=2),
     "list_job_runs_tool": lambda **p: json.dumps(list_job_runs(get_config(), p), indent=2),
@@ -260,48 +256,61 @@ async def mcp_protocol_endpoint(request):
             })
             
         elif method == "tools/list":
-            # Just return the 6 main tools that were working before
-            tools = [
-                {"name": "list_jobs_tool", "description": "List all jobs in the Cloudera AI project", 
-                 "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-                {"name": "list_projects_tool", "description": "List all available projects",
-                 "inputSchema": {"type": "object", "properties": {}, "required": []}},
-                {"name": "get_runtimes_tool", "description": "Get available runtimes from Cloudera AI",
-                 "inputSchema": {"type": "object", "properties": {}, "required": []}},
-                {"name": "list_applications_tool", "description": "List all applications in the Cloudera AI project",
-                 "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-                {"name": "list_experiments_tool", "description": "List all experiments in the Cloudera AI project",
-                 "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-                {"name": "list_models_tool", "description": "List all models in the Cloudera AI project",
-                 "inputSchema": {"type": "object", "properties": {"project_id": {"type": "string"}}, "required": []}},
-            ]
+            # Dynamically discover all registered tools from FastMCP
+            tools_dict = await mcp.get_tools()
+            tools = []
+            for name, tool in tools_dict.items():
+                mcp_tool = tool.to_mcp_tool()
+                tools.append({
+                    "name": mcp_tool.name,
+                    "description": mcp_tool.description or "",
+                    "inputSchema": mcp_tool.inputSchema
+                })
             return JSONResponse({"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools}})
             
         elif method == "tools/call":
             tool_name = params.get("name")
             arguments = params.get("arguments", {})
-            
-            # Get implementation from our mapping
+
+            # Try TOOL_IMPLEMENTATIONS first (legacy mapping)
             impl_func = TOOL_IMPLEMENTATIONS.get(tool_name)
-            
-            if not impl_func:
+
+            if impl_func:
+                try:
+                    result = impl_func(**arguments)
+                    return JSONResponse({
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "result": {"content": [{"type": "text", "text": str(result)}], "isError": False}
+                    })
+                except Exception as e:
+                    return JSONResponse({
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "result": {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
+                    })
+
+            # Fall through to FastMCP's native tool calling
+            tools_dict = await mcp.get_tools()
+            tool = tools_dict.get(tool_name)
+            if not tool:
                 return JSONResponse({
-                    "jsonrpc": "2.0", 
-                    "id": request_id, 
+                    "jsonrpc": "2.0",
+                    "id": request_id,
                     "error": {"code": -32601, "message": f"Tool not found: {tool_name}"}
                 }, status_code=404)
-            
+
             try:
-                result = impl_func(**arguments)
+                result = await tool.run(arguments)
                 return JSONResponse({
-                    "jsonrpc": "2.0", 
-                    "id": request_id, 
+                    "jsonrpc": "2.0",
+                    "id": request_id,
                     "result": {"content": [{"type": "text", "text": str(result)}], "isError": False}
                 })
             except Exception as e:
                 return JSONResponse({
-                    "jsonrpc": "2.0", 
-                    "id": request_id, 
+                    "jsonrpc": "2.0",
+                    "id": request_id,
                     "result": {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
                 })
                 

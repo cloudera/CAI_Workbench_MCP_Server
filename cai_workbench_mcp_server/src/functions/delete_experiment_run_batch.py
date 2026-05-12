@@ -1,124 +1,118 @@
-"""
-Delete multiple experiment runs in Cloudera AI
-"""
-import os
+"""Bulk delete experiment run details (metrics, params, tags) in one request."""
+
 import json
 import requests
 from urllib.parse import urlparse
-from typing import Dict, Any, List
+from typing import Dict, Any
+
 
 def delete_experiment_run_batch(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Delete multiple experiment runs in Cloudera AI
-    
+    Bulk delete experiment run details like metrics, params, and tags in one request.
+
     Args:
         config: MCP configuration with host and api_key
         params: Parameters for the API call:
-            - project_id: ID of the project (required)
-            - experiment_id: ID of the experiment (required)
-            - run_ids: List of run IDs to delete (required)
-    
+            - project_id (str): ID of the project (required)
+            - experiment_id (str): ID of the experiment (required)
+            - run_id (str): ID of the experiment run (required)
+            - metrics (list): List of metric key names to delete (optional)
+            - params_to_delete (list): List of param key names to delete (optional)
+            - tags (list): List of tag key names to delete (optional)
+
     Returns:
-        Dict with success flag, message, and deletion results
+        Dict with success flag, message, and response data
     """
     # Validate required parameters
-    required_params = ["project_id", "experiment_id", "run_ids"]
-    missing_params = [p for p in required_params if p not in params or not params[p]]
-    if missing_params:
-        return {"success": False, "message": f"Missing required parameters: {', '.join(missing_params)}"}
-    
-    # Make sure run_ids is a list
-    run_ids = params["run_ids"]
-    if not isinstance(run_ids, list) or not run_ids:
-        return {"success": False, "message": "run_ids must be a non-empty list of experiment run IDs"}
-    
-    # Format host URL correctly
+    project_id = params.get("project_id") or config.get("project_id")
+    experiment_id = params.get("experiment_id")
+    run_id = params.get("run_id")
+
+    if not project_id:
+        return {"success": False, "message": "project_id is required", "data": None}
+    if not experiment_id:
+        return {"success": False, "message": "experiment_id is required", "data": None}
+    if not run_id:
+        return {"success": False, "message": "run_id is required", "data": None}
+
+    # At least one of metrics, params, or tags must be provided
+    metrics = params.get("metrics", [])
+    params_to_delete = params.get("params_to_delete", [])
+    tags = params.get("tags", [])
+
+    if not metrics and not params_to_delete and not tags:
+        return {
+            "success": False,
+            "message": "At least one of metrics, params_to_delete, or tags must be provided",
+            "data": None
+        }
+
+    # Format host URL
     host = config.get("host", "")
     if not host:
-        return {"success": False, "message": "Missing host in configuration"}
-    
-    # Make sure host has the correct scheme
+        return {"success": False, "message": "Missing host in configuration", "data": None}
+
     parsed_url = urlparse(host)
     if not parsed_url.scheme:
         host = "https://" + host
-    elif parsed_url.scheme and "://" in host[len(parsed_url.scheme)+3:]:
-        # Fix potential double https:// in the URL
-        host = parsed_url.scheme + "://" + host.split("://")[-1]
-    
+    elif host.startswith("http://"):
+        host = "https://" + host[7:]
+
+    host = host.rstrip("/")
+
     api_key = config.get("api_key")
     if not api_key:
-        return {"success": False, "message": "Missing api_key in configuration"}
-    
-    # Build the URL for the delete request
-    project_id = params["project_id"]
-    experiment_id = params["experiment_id"]
-    api_url = f"{host}/api/v2/projects/{project_id}/experiments/{experiment_id}/runs-batch"
-    print(f"Deleting experiment runs batch with URL: {api_url}")
-    
-    # Prepare the JSON payload with run IDs
-    request_data = {
-        "ids": run_ids
-    }
-    
-    # Setup headers
+        return {"success": False, "message": "Missing api_key in configuration", "data": None}
+
+    # Build the URL per swagger: POST .../runs/{run_id}:deletebatch
+    url = f"{host}/api/v2/projects/{project_id}/experiments/{experiment_id}/runs/{run_id}:deletebatch"
+
+    # Prepare payload matching swagger schema
+    payload = {}
+    if metrics:
+        payload["metrics"] = metrics
+    if params_to_delete:
+        payload["params"] = params_to_delete
+    if tags:
+        payload["tags"] = tags
+
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     try:
-        # Make DELETE request with JSON payload
-        response = requests.delete(api_url, headers=headers, json=request_data, timeout=30)
-        
-        # Check if request was successful
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+
         if response.status_code >= 400:
             try:
                 error_data = response.json()
                 return {
                     "success": False,
-                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
-                    "details": error_data.get("error", {})
-                }
-            except:
-                return {
-                    "success": False,
-                    "message": f"Failed to delete experiment runs: HTTP {response.status_code}"
-                }
-        
-        # Parse response if there is content
-        if response.text.strip():
-            try:
-                response_data = response.json()
-                
-                # Check if there's an error in the response
-                if "error" in response_data:
-                    return {
-                        "success": False,
-                        "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
-                        "details": response_data.get("error", {})
-                    }
-                
-                return {
-                    "success": True,
-                    "message": f"Successfully deleted {len(run_ids)} experiment runs",
-                    "data": response_data
+                    "message": f"API error (HTTP {response.status_code}): {error_data.get('message', response.text)}",
+                    "data": error_data
                 }
             except json.JSONDecodeError:
-                pass
-        
-        # If we got here, the deletion was likely successful but returned no content
+                return {
+                    "success": False,
+                    "message": f"API error: HTTP {response.status_code} - {response.text}",
+                    "data": None
+                }
+
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            data = None
+
         return {
             "success": True,
-            "message": f"Successfully deleted {len(run_ids)} experiment runs"
+            "message": f"Successfully deleted batch details from experiment run {run_id}",
+            "data": data
         }
-    
+
     except requests.RequestException as e:
         return {
             "success": False,
-            "message": f"Error deleting experiment runs: {str(e)}"
+            "message": f"Request error: {str(e)}",
+            "data": None
         }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error deleting experiment runs: {str(e)}"
-        } 

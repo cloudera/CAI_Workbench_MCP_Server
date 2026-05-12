@@ -71,7 +71,7 @@ def stop_job_run(config, params=None):
     host = host.rstrip('/')
 
     # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}/runs/{run_id}/stop"
+    url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}/runs/{run_id}:stop"
     
     print(f"Accessing: {url}")
 

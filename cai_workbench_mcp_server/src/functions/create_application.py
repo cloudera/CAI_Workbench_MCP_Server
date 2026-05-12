@@ -1,5 +1,6 @@
 """Create application function for Cloudera AI Workbench MCP"""
 
+import re
 import requests
 import json
 from typing import Dict, Any
@@ -50,8 +51,16 @@ def create_application(config: Dict[str, str], params: Dict[str, Any]) -> Dict[s
         # Prepare request payload
         payload = {
             "name": params["name"],
-            "script": params["script"]
+            "script": params["script"],
         }
+        if "subdomain" in params and params["subdomain"]:
+            payload["subdomain"] = params["subdomain"]
+        else:
+            # Auto-generate subdomain from application name
+            subdomain = re.sub(r'[^a-z0-9-]', '', params["name"].lower().replace(' ', '-'))
+            subdomain = re.sub(r'-+', '-', subdomain).strip('-')
+            if subdomain:
+                payload["subdomain"] = subdomain
         
         # Add optional parameters
         if "description" in params:
