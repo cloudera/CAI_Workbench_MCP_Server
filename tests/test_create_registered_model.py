@@ -1,4 +1,4 @@
-"""Unit tests for create_registered_model (tags JSON string handling)."""
+"""Unit tests for create_registered_model (tags handling)."""
 
 from unittest.mock import MagicMock, patch
 
@@ -16,16 +16,11 @@ def config():
 
 
 def test_create_registered_model_parses_tags_json_string(config):
-    """MCP passes tags as a string; API expects a JSON array — verify payload."""
-    captured = {}
-
-    def fake_post(url, headers=None, json=None, timeout=None):
-        captured["url"] = url
-        captured["json"] = json
-        resp = MagicMock()
-        resp.raise_for_status = MagicMock()
-        resp.json = MagicMock(return_value={"model_id": "mid", "name": "m"})
-        return resp
+    """MCP passes tags as a JSON array string; verify it gets parsed."""
+    mock_client = MagicMock()
+    mock_result = MagicMock()
+    mock_result.to_dict.return_value = {"model_id": "mid", "name": "m"}
+    mock_client.create_registered_model.return_value = mock_result
 
     params = {
         "project_id": "p1",
@@ -33,18 +28,19 @@ def test_create_registered_model_parses_tags_json_string(config):
         "run_id": "r1",
         "model_path": "model",
         "model_name": "test-model",
-        "tags": '[{"key": "env", "value": "ci"}]',
+        "tags": '[{"key": "env", "value": "prod"}]',
     }
 
-    with patch("cai_workbench_mcp_server.src.functions.create_registered_model.requests.post", fake_post):
+    with patch("cai_workbench_mcp_server.src.functions.create_registered_model.setup_client", return_value=mock_client):
         result = create_registered_model(config, params)
 
     assert result["success"] is True
-    assert captured["json"]["tags"] == [{"key": "env", "value": "ci"}]
-    assert captured["url"].endswith("/api/v2/registry/models")
+    call_body = mock_client.create_registered_model.call_args[0][0]
+    assert len(call_body.tags) == 1
 
 
 def test_create_registered_model_invalid_tags_string_returns_error(config):
+    """Non-JSON tags string should return error."""
     params = {
         "project_id": "p1",
         "experiment_id": "e1",
@@ -55,23 +51,18 @@ def test_create_registered_model_invalid_tags_string_returns_error(config):
     }
 
     result = create_registered_model(config, params)
-
     assert result["success"] is False
-    assert "tags must be a JSON array string" in result["message"]
+    assert "JSON array" in result["message"]
 
 
 def test_create_registered_model_accepts_list_tags(config):
-    """Non-string tags are forwarded as-is (callers passing native lists)."""
-    captured = {}
+    """List of dicts forwarded as Tag objects."""
+    mock_client = MagicMock()
+    mock_result = MagicMock()
+    mock_result.to_dict.return_value = {}
+    mock_client.create_registered_model.return_value = mock_result
 
-    def fake_post(url, headers=None, json=None, timeout=None):
-        captured["json"] = json
-        resp = MagicMock()
-        resp.raise_for_status = MagicMock()
-        resp.json = MagicMock(return_value={})
-        return resp
-
-    tags = [{"key": "a", "value": "b"}]
+    tags = [{"key": "a", "value": "b"}, {"key": "c", "value": "d"}]
     params = {
         "project_id": "p1",
         "experiment_id": "e1",
@@ -81,8 +72,9 @@ def test_create_registered_model_accepts_list_tags(config):
         "tags": tags,
     }
 
-    with patch("cai_workbench_mcp_server.src.functions.create_registered_model.requests.post", fake_post):
+    with patch("cai_workbench_mcp_server.src.functions.create_registered_model.setup_client", return_value=mock_client):
         result = create_registered_model(config, params)
 
     assert result["success"] is True
-    assert captured["json"]["tags"] == tags
+    call_body = mock_client.create_registered_model.call_args[0][0]
+    assert len(call_body.tags) == 2

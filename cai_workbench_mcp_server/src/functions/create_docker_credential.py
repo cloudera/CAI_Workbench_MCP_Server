@@ -1,26 +1,28 @@
-"""Create a Docker credential."""
+"""Cloudera AI: create_docker_credential."""
 
-import requests
+import json
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+from .http_helpers import setup_client, serialize_result
 
 def create_docker_credential(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """create_docker_credential."""
+    params = params or {}
+    body_json = params.get("body_json")
+    if not body_json:
+        return {"success": False, "message": "body_json is required"}
+    body = json.loads(body_json) if isinstance(body_json, str) else body_json
     try:
-        if not params.get("body"):
-            return {"success": False, "message": "Missing body (CreateDockerCredentialRequest)"}
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.post(
-            f"{host}/api/v2/dockercredentials",
-            headers=auth_headers(api_key),
-            json=params["body"],
-            timeout=120,
-        )
-        r.raise_for_status()
-        return {"success": True, "message": "create_docker_credential ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.create_docker_credential(body)
+        return {"success": True, "message": "create_docker_credential ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("create_docker_credential", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

@@ -1,24 +1,32 @@
-"""List team accelerator quota (admin)."""
+"""Cloudera AI: list_teams_accelerator_quota."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, pick_query, request_error
-
-_Q = ("search_filter",)
-
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+from .http_helpers import setup_client, serialize_result
 
 def list_teams_accelerator_quota(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """list_teams_accelerator_quota."""
+    params = params or {}
+    kwargs = {}
+    if params.get("search_filter"):
+        kwargs["search_filter"] = params["search_filter"]
+    if params.get("page_size"):
+        kwargs["page_size"] = params["page_size"]
+    if params.get("page_token"):
+        kwargs["page_token"] = params["page_token"]
+    if params.get("sort"):
+        kwargs["sort"] = params["sort"]
     try:
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        q = pick_query(params or {}, _Q)
-        r = requests.get(
-            f"{host}/api/v2/userslabels/team-quota", headers=auth_headers(api_key), params=q, timeout=60
-        )
-        r.raise_for_status()
-        return {"success": True, "message": "list_teams_accelerator_quota ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_teams_accelerator_quota(**kwargs)
+        return {"success": True, "message": "list_teams_accelerator_quota ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("list_teams_accelerator_quota", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

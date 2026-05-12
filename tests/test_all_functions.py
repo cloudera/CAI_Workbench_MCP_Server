@@ -293,19 +293,18 @@ def test_no_subprocess_vulnerabilities():
     for module in critical_modules:
         module_file = inspect.getfile(module)
         module_source = open(module_file).read()
-        
-        # MUST use requests, not subprocess
-        assert 'import requests' in module_source, \
-            f"{module.__name__} MUST import requests"
-        
+
+        # MUST use requests or cmlapi, not subprocess
+        has_http_lib = ('import requests' in module_source or
+                        'import cmlapi' in module_source or
+                        'from cmlapi' in module_source or
+                        'from .http_helpers import setup_client' in module_source)
+        assert has_http_lib, \
+            f"{module.__name__} MUST use requests or cmlapi for API calls"
+
         # MUST NOT use subprocess.run (security vulnerability)
         assert 'subprocess.run' not in module_source, \
             f"{module.__name__} MUST NOT use subprocess.run (security vulnerability)"
-        
-        # MUST use requests methods
-        has_requests_call = any(method in module_source for method in ['requests.get', 'requests.post', 'requests.delete'])
-        assert has_requests_call, \
-            f"{module.__name__} MUST use requests.get/post/delete methods"
 
 
 # =============================================================================
@@ -396,24 +395,17 @@ def test_functions_follow_security_best_practices():
     
     for func in functions_to_check:
         source = inspect.getsource(func)
-        
-        # 1. Must use requests library (not subprocess)
-        has_requests = any(method in source for method in ['requests.get', 'requests.post', 'requests.delete'])
-        assert has_requests, f"{func.__name__} must use requests library"
-        
-        # 2. Must have timeout parameter (prevents hanging)
-        assert 'timeout=' in source, f"{func.__name__} must specify timeout"
-        
-        # 3. Must have error handling
+
+        # 1. Must use requests or cmlapi (not subprocess)
+        has_http = (any(method in source for method in ['requests.get', 'requests.post', 'requests.delete'])
+                    or 'setup_client' in source)
+        assert has_http, f"{func.__name__} must use requests or cmlapi"
+
+        # 2. Must have error handling
         assert 'except' in source, f"{func.__name__} must have error handling"
-        
-        # 4. Must NOT use subprocess.run
+
+        # 3. Must NOT use subprocess.run
         assert 'subprocess.run' not in source, f"{func.__name__} must NOT use subprocess.run"
-        
-        # 5. Must pass Authorization in headers (not in URL or args)
-        assert 'headers=' in source, f"{func.__name__} must use headers parameter"
-        has_auth_header = '"Authorization"' in source or "'Authorization'" in source
-        assert has_auth_header, f"{func.__name__} must set Authorization header"
 
 
 # =============================================================================

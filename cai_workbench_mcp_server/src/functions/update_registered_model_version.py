@@ -1,95 +1,34 @@
-"""Update a Registered model version. function for Cloudera AI Workbench MCP"""
+"""Update a registered model version in Cloudera AI."""
 
-import requests
-import json
-from typing import Dict, Any
+from typing import Any, Dict
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+from .http_helpers import setup_client, serialize_result
 
 def update_registered_model_version(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Update a Registered model version.
-    
-    Args:
-        config: MCP configuration with host and api_key
-        params: Function parameters
-            - model_id (required)
-            - model_version_id (required)
-            - notes (optional)
-            - tags (optional)
-        
-    Returns:
-        update_registered_model_version results
-    """
+    """Update a registered model version."""
+    params = params or {}
+    model_id = params.get("model_id")
+    model_version_id = params.get("model_version_id")
+    if not model_id:
+        return {"success": False, "message": "model_id is required"}
+    if not model_version_id:
+        return {"success": False, "message": "model_version_id is required"}
+    body = {}
+    if params.get("notes"):
+        body["notes"] = params["notes"]
+    if params.get("tags"):
+        body["tags"] = params["tags"].split(",") if isinstance(params["tags"], str) else params["tags"]
     try:
-        # Validate required parameters
-        required_params = ['model_id', 'model_version_id']
-        missing_params = [p for p in required_params if p not in params or not params[p]]
-        if missing_params:
-            return {"success": False, "message": f"Missing required parameters: {', '.join(missing_params)}"}
-            
-        # Format host URL correctly
-        host = config.get("host", "").strip()
-        if host.startswith("https://https://"):
-            host = host.replace("https://https://", "https://")
-        if not host.startswith(("http://", "https://")):
-            host = "https://" + host
-        host = host.rstrip("/")
-        
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-            
-        # Prepare request payload
-        payload = {}
-        payload["model_version_id"] = params["model_version_id"]
-        if "notes" in params:
-            payload["notes"] = params["notes"]
-        if "tags" in params:
-            payload["tags"] = params["tags"]
-
-        
-        # Build the URL for the request
-        api_url = f"{host}/api/v2/registry/models/{params['model_id']}"
-
-        
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Make the request
-        response = requests.patch(api_url, headers=headers, json=payload)
-        response.raise_for_status()
-        
-        # Parse the response
-        try:
-            data = response.json()
-        except:
-            data = {"message": "Success", "text": response.text}
-        
-        return {
-            "success": True,
-            "message": "Successfully executed update_registered_model_version",
-            "data": data
-        }
-        
-    except requests.exceptions.RequestException as e:
-        error_message = str(e)
-        response_body = ""
-        if hasattr(e, 'response') and e.response is not None:
-            try:
-                response_body = e.response.json()
-                error_message = f"{error_message} - {json.dumps(response_body)}"
-            except:
-                if hasattr(e.response, 'text'):
-                    response_body = e.response.text
-                    error_message = f"{error_message} - {response_body}"
-        
-        return {
-            "success": False,
-            "message": f"API request error: {error_message}"
-        }
+        client = setup_client(config["host"], config["api_key"])
+        result = client.update_registered_model_version(body, model_id, model_version_id)
+        return {"success": True, "message": f"Successfully updated model version '{model_version_id}'", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error executing update_registered_model_version: {str(e)}"
-        }
+        return {"success": False, "message": f"Error: {str(e)}"}

@@ -1,28 +1,26 @@
-"""List API v2 keys for a user."""
+"""List API v2 keys in Cloudera AI."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+from .http_helpers import setup_client, serialize_result
 
 def list_v2_keys(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """List API v2 keys for a user."""
+    params = params or {}
+    username = params.get("username")
+    if not username:
+        return {"success": False, "message": "username is required"}
     try:
-        user = params.get("username")
-        if not user:
-            return {"success": False, "message": "Missing username"}
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        from urllib.parse import quote
-
-        r = requests.get(
-            f"{host}/api/v2/users/{quote(user, safe='')}/v2_keys",
-            headers=auth_headers(api_key),
-            timeout=60,
-        )
-        r.raise_for_status()
-        return {"success": True, "message": "list_v2_keys ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_v2_keys(username)
+        return {"success": True, "message": "list_v2_keys ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("list_v2_keys", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

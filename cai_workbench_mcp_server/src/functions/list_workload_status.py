@@ -1,19 +1,23 @@
-"""List workload status values."""
+"""Cloudera AI: list_workload_status."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+from .http_helpers import setup_client, serialize_result
 
 def list_workload_status(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """list_workload_status."""
+    params = params or {}
     try:
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.get(f"{host}/api/v2/workloadstatus", headers=auth_headers(api_key), timeout=60)
-        r.raise_for_status()
-        return {"success": True, "message": "list_workload_status ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_workload_status()
+        return {"success": True, "message": "list_workload_status ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("list_workload_status", e)
+        return {"success": False, "message": f"Error: {str(e)}"}
