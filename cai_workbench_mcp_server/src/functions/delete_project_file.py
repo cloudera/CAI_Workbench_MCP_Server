@@ -47,11 +47,27 @@ def delete_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[
     if not api_key:
         return {"success": False, "message": "Missing api_key in configuration"}
     
-    # URL encode the file path
-    encoded_file_path = quote(file_path)
-    
-    # Build the URL for the delete request
-    delete_url = f"{host}/api/v2/projects/{project_id}/files?path={encoded_file_path}"
+    # Refuse paths that resolve to the project file root. Sending an empty
+    # or root-equivalent path used to combine with the ?path= bug below to
+    # delete the entire project recursively; even with the URL-segment fix
+    # we never want this tool to issue DELETE on /files itself.
+    normalized = file_path.strip().strip("/")
+    if not normalized or normalized in (".", ".."):
+        return {
+            "success": False,
+            "message": (
+                "Refusing to delete: file_path resolves to the project root. "
+                "delete_project_file is not allowed to target the project file root."
+            ),
+        }
+
+    # Build the URL for the delete request. The Cloudera v2 API expects the
+    # path as a URL segment, not a query parameter; sending ?path=... was
+    # silently ignored and the request was interpreted as
+    #   DELETE /api/v2/projects/{project_id}/files
+    # which deletes the entire project file tree (see issue #13).
+    encoded_file_path = quote(normalized, safe="/")
+    delete_url = f"{host}/api/v2/projects/{project_id}/files/{encoded_file_path}"
     print(f"Deleting project file with URL: {delete_url}")
     
     # Setup headers
