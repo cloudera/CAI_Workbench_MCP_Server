@@ -4,7 +4,10 @@ from typing import Any, Dict
 try:
     from cmlapi.rest import ApiException
 except ImportError:
-    ApiException = Exception
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
 from .http_helpers import setup_client, serialize_result
 
 def list_project_files(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:

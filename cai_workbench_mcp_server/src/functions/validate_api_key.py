@@ -5,7 +5,10 @@ from typing import Any, Dict
 try:
     from cmlapi.rest import ApiException
 except ImportError:
-    ApiException = Exception
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
 from .http_helpers import setup_client, serialize_result
 
 def validate_api_key(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
