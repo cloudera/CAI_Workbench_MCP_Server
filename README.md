@@ -21,6 +21,11 @@ A Model Context Protocol (MCP) server for Cloudera AI workbench built with FastM
 - Access to a Cloudera AI instance  
 - Valid Cloudera AI API key
 - `uv` package manager (for local development)
+- `cmlapi` SDK (installed from your Cloudera AI instance — see setup below)
+
+## Architecture
+
+All API tools use the official **`cmlapi` Python SDK** (`CMLServiceApi`) rather than raw HTTP requests. A shared `setup_client()` in `http_helpers.py` creates a configured client; each tool function is a thin wrapper around the corresponding SDK method. This eliminates URL construction bugs, provides typed request/response objects, and ensures correct endpoint paths (e.g. `:restart` vs `/restart`).
 
 ## Quick Start
 
@@ -320,8 +325,6 @@ The server exposes **105** tools. The authoritative list is whatever the running
 - `list_registered_models_tool`, `create_registered_model_tool`, `get_registered_model_tool`, `update_registered_model_tool`, `delete_registered_model_tool`
 - `update_registered_model_version_tool`, `get_registered_model_version_tool`, `delete_registered_model_version_tool`
 
-For `create_registered_model_tool`, **`tags`** is passed through the MCP as a string. Use a **JSON array** string, for example `[{"key":"env","value":"prod"}]`, so the payload matches the API.
-
 ### Experiments
 - Per-project: `create_experiment_tool`, `list_experiments_tool`, `get_experiment_tool`, `update_experiment_tool`, `delete_experiment_tool`
 - Runs: `create_experiment_run_tool`, `get_experiment_run_tool`, `update_experiment_run_tool`, `delete_experiment_run_tool`, `delete_experiment_run_batch_tool`, `log_experiment_run_batch_tool`
@@ -341,9 +344,6 @@ For `create_registered_model_tool`, **`tags`** is passed through the MCP as a st
 - `get_default_quota_tool`, `get_default_quotas_tool`, `list_all_resource_groups_tool`, `list_all_accelerator_node_labels_tool`
 - `list_news_feeds_tool`, `list_ml_serving_apps_tool`, `list_workload_executions_tool`, `list_workload_status_tool`, `list_workload_types_tool`
 
-### Optional sample script (MLflow / XGBoost)
-
-`inference_test.py` at the repository root is an **optional** end-to-end sample: train a small XGBoost model, log it with MLflow (experiment `xgboost-mcp`), and optionally register via the registry. It is **not** part of the MCP package dependencies. Install extras locally, for example: `uv pip install mlflow xgboost scikit-learn`. Runs inside a Cloudera AI workbench session work without extra tracking URI setup; from a laptop you must align `MLFLOW_TRACKING_URI` / auth with your environment.
 
 ## Examples
 
@@ -394,10 +394,11 @@ create_model_deployment_tool(
 
 ## Troubleshooting
 
-1. **"Missing required configuration"**: Set CAI_WORKBENCH_HOST and CAI_WORKBENCH_API_KEY
-2. **"cmlapi not found"**: Install from your Cloudera AI instance
-3. **HTTP connection issues**: Ensure server is running on correct port
-4. **Tool not found**: Check tool name spelling (use `list_tools`)
+1. **"Missing required configuration"**: Set `CAI_WORKBENCH_HOST` and `CAI_WORKBENCH_API_KEY`
+2. **"No module named 'cmlapi'"**: Install from your instance: `uv pip install https://$CDSW_DOMAIN/api/v2/python.tar.gz`
+3. **"Object of type datetime is not JSON serializable"**: Ensure you're on the latest code — `serialize_result()` handles this
+4. **HTTP connection issues**: Ensure server is running on correct port
+5. **Tool not found**: Check tool name spelling (use MCP `tools/list`)
 
 ## Security Notes
 

@@ -1,93 +1,38 @@
-"""List jobs function for Cloudera AI Workbench MCP"""
+"""List jobs in Cloudera AI."""
 
-import requests
-from typing import Dict, Any
-from datetime import datetime
+from typing import Any, Dict
+
+from cmlapi.rest import ApiException
+
+from .http_helpers import setup_client, serialize_result
 
 
 def list_jobs(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    List jobs in the Cloudera AI project
-    
-    Args:
-        config: MCP configuration
-        params: Function parameters (unused)
-        
-    Returns:
-        Dictionary containing list of jobs
-    """
+    """List jobs in Cloudera AI."""
+    params = params or {}
+    project_id = params.get("project_id") or config.get("project_id")
+    if not project_id:
+        return {"success": False, "message": "project_id is required"}
+
+    kwargs = {}
+    if params.get("search_filter"):
+        kwargs["search_filter"] = params["search_filter"]
+    if params.get("page_size"):
+        kwargs["page_size"] = params["page_size"]
+    if params.get("page_token"):
+        kwargs["page_token"] = params["page_token"]
+    if params.get("sort"):
+        kwargs["sort"] = params["sort"]
+
     try:
-        project_id = config.get("project_id")
-        
-        if not project_id:
-            return {
-                "success": False,
-                "message": "Missing project_id in configuration"
-            }
-        
-        # Properly format the host URL
-        host = config['host'].strip()
-        # Remove duplicate https:// if present
-        if host.startswith("https://https://"):
-            host = host.replace("https://https://", "https://")
-        # Ensure URL has a scheme
-        if not host.startswith(("http://", "https://")):
-            host = "https://" + host
-        # Remove trailing slash if present
-        host = host.rstrip("/")
-        
-        url = f"{host}/api/v2/projects/{project_id}/jobs"
-        headers = {
-            "Authorization": f"Bearer {config['api_key']}",
-            "Content-Type": "application/json"
-        }
-        
-        print(f"Making request to: {url}")  # Debug output
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        
-        # Format jobs for easier consumption
-        jobs_data = response.json()
-        jobs = jobs_data.get("jobs", [])
-        
-        formatted_jobs = []
-        for job in jobs:
-            # Format date for better readability
-            created_at = job.get("created_at")
-            if created_at:
-                try:
-                    # Parse ISO format date and format it
-                    dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                    formatted_date = dt.strftime("%Y-%m-%d %H:%M:%S UTC")
-                except (ValueError, TypeError):
-                    formatted_date = created_at
-            else:
-                formatted_date = "Unknown"
-            
-            formatted_jobs.append({
-                "id": job.get("id"),
-                "name": job.get("name"),
-                "status": job.get("status"),
-                "created_at": formatted_date,
-                "script": job.get("script"),
-                "cpu": job.get("cpu"),
-                "memory": job.get("memory"),
-                "gpu": job.get("nvidia_gpu")
-            })
-        
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_jobs(project_id, **kwargs)
         return {
             "success": True,
-            "message": f"Found {len(formatted_jobs)} jobs",
-            "jobs": formatted_jobs,
-            "count": len(formatted_jobs)
+            "message": "list_jobs ok",
+            "data": serialize_result(result),
         }
-    except requests.exceptions.RequestException as e:
-        return {
-            "success": False,
-            "message": f"API request error: {str(e)}"
-        }
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error listing jobs: {str(e)}"
-        } 
+        return {"success": False, "message": f"Error: {str(e)}"}

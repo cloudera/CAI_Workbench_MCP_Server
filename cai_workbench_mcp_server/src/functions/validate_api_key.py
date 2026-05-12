@@ -1,26 +1,22 @@
-"""Validate an API v2 key token."""
+"""Cloudera AI: validate_api_key."""
 
-import requests
+import json
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
 def validate_api_key(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """validate_api_key."""
+    params = params or {}
+    body_json = params.get("body_json")
+    if not body_json:
+        return {"success": False, "message": "body_json is required"}
+    body = json.loads(body_json) if isinstance(body_json, str) else body_json
     try:
-        if not params.get("body"):
-            return {"success": False, "message": "Missing body (ValidateAPIKeyRequest)"}
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.post(
-            f"{host}/api/v2/auth/validate_key",
-            headers=auth_headers(api_key),
-            json=params["body"],
-            timeout=60,
-        )
-        r.raise_for_status()
-        return {"success": True, "message": "validate_api_key ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.validate_api_key(body)
+        return {"success": True, "message": "validate_api_key ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("validate_api_key", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

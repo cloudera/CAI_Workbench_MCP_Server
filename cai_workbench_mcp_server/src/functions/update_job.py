@@ -1,131 +1,41 @@
-"""Function to update a job in a Cloudera AI project."""
+"""Update a job in Cloudera AI."""
 
 import json
-import os
-import requests
-from urllib.parse import urlparse
+from typing import Any, Dict
+
+from cmlapi.rest import ApiException
+
+from .http_helpers import setup_client, serialize_result
 
 
-def update_job(config, params=None):
-    """
-    Update a job in a Cloudera AI project.
-
-    Args:
-        config (dict): MCP configuration.
-        params (dict, optional): Parameters for the API call. Default is None.
-            - project_id (str, optional): ID of the project.
-                If not provided, it will be taken from the configuration.
-            - job_id (str): ID of the job to update.
-            - name (str, optional): New name for the job.
-            - script (str, optional): New script path for the job.
-            - kernel (str, optional): New kernel type.
-            - cpu (int, optional): New CPU cores allocation.
-            - memory (int, optional): New memory allocation in GB.
-            - nvidia_gpu (int, optional): New GPU allocation.
-            - runtime_identifier (str, optional): New runtime identifier.
-            - environment_variables (dict, optional): New environment variables.
-
-    Returns:
-        dict: Response with the following structure:
-            {
-                "success": bool,
-                "message": str,
-                "data": dict  # Result data if successful, otherwise None
-            }
-    """
+def update_job(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Update an existing job."""
     params = params or {}
-    project_id = params.get('project_id') or config.get('project_id')
-    job_id = params.get('job_id')
+    project_id = params.get("project_id") or config.get("project_id")
+    job_id = params.get("job_id")
 
     if not project_id:
-        return {
-            "success": False,
-            "message": "project_id is required either in config or params",
-            "data": None
-        }
-
+        return {"success": False, "message": "project_id is required"}
     if not job_id:
-        return {
-            "success": False,
-            "message": "job_id is required in params",
-            "data": None
-        }
+        return {"success": False, "message": "job_id is required"}
 
-    # Format host URL
-    host = config.get('host', '')
-    if not host:
-        return {
-            "success": False,
-            "message": "host is required in config",
-            "data": None
-        }
-
-    # Ensure the host has the correct scheme and no trailing slash
-    parsed_url = urlparse(host)
-    if not parsed_url.scheme:
-        host = 'https://' + host
-    elif host.startswith('http://'):
-        host = 'https://' + host[7:]
-
-    host = host.rstrip('/')
-
-    # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}"
-    
-    print(f"Accessing: {url}")
-
-    # Prepare request data
-    request_data = {}
-    
-    # Add optional parameters to request data
-    for key in ['name', 'script', 'kernel', 'cpu', 'memory', 'nvidia_gpu', 'runtime_identifier', 'environment_variables']:
+    body = {}
+    for key in ("name", "script", "kernel", "cpu", "memory", "nvidia_gpu", "runtime_identifier"):
         if params.get(key) is not None:
-            request_data[key] = params[key]
-    
-    # Prepare headers with API key
-    headers = {
-        "Authorization": f"Bearer {config.get('api_key', '')}",
-        "Content-Type": "application/json"
-    }
+            body[key] = params[key]
+    if params.get("environment_variables"):
+        env = params["environment_variables"]
+        body["environment_variables"] = json.loads(env) if isinstance(env, str) else env
 
-    # Execute the PATCH request using requests library (secure)
     try:
-        response = requests.patch(
-            url,
-            headers=headers,
-            json=request_data,
-            timeout=30
-        )
-
-        if response.status_code >= 400:
-            return {
-                "success": False,
-                "message": f"API request failed with status {response.status_code}: {response.text}",
-                "data": None
-            }
-
-        try:
-            data = response.json()
-            return {
-                "success": True,
-                "message": f"Successfully updated job {job_id}",
-                "data": data
-            }
-        except json.JSONDecodeError:
-            return {
-                "success": False,
-                "message": f"Failed to parse response as JSON: {response.text}",
-                "data": None
-            }
-    except requests.RequestException as e:
+        client = setup_client(config["host"], config["api_key"])
+        result = client.update_job(body, project_id, job_id)
         return {
-            "success": False,
-            "message": f"API request error: {str(e)}",
-            "data": None
+            "success": True,
+            "message": f"Successfully updated job '{job_id}'",
+            "data": serialize_result(result),
         }
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"An unexpected error occurred: {str(e)}",
-            "data": None
-        } 
+        return {"success": False, "message": f"Error updating job: {str(e)}"}

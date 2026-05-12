@@ -1,19 +1,17 @@
-"""List resource groups."""
+"""Cloudera AI: list_all_resource_groups."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
 def list_all_resource_groups(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """list_all_resource_groups."""
+    params = params or {}
     try:
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.get(f"{host}/api/v2/resourcegroups", headers=auth_headers(api_key), timeout=60)
-        r.raise_for_status()
-        return {"success": True, "message": "list_all_resource_groups ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_all_resource_groups()
+        return {"success": True, "message": "list_all_resource_groups ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("list_all_resource_groups", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

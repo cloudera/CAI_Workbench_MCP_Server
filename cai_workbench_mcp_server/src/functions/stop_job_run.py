@@ -1,119 +1,35 @@
-"""Function to stop a running job run in a Cloudera AI project."""
+"""Stop a job run in Cloudera AI."""
 
-import json
-import os
-import requests
-from urllib.parse import urlparse
+from typing import Any, Dict
+
+from cmlapi.rest import ApiException
+
+from .http_helpers import setup_client, serialize_result
 
 
-def stop_job_run(config, params=None):
-    """
-    Stop a running job run in a Cloudera AI project.
-
-    Args:
-        config (dict): MCP configuration.
-        params (dict, optional): Parameters for the API call. Default is None.
-            - project_id (str, optional): ID of the project.
-                If not provided, it will be taken from the configuration.
-            - job_id (str): ID of the job.
-            - run_id (str): ID of the job run to stop.
-
-    Returns:
-        dict: Response with the following structure:
-            {
-                "success": bool,
-                "message": str,
-                "data": dict  # Result data if successful, otherwise None
-            }
-    """
+def stop_job_run(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Stop a running job run."""
     params = params or {}
-    project_id = params.get('project_id') or config.get('project_id')
-    job_id = params.get('job_id')
-    run_id = params.get('run_id')
+    project_id = params.get("project_id") or config.get("project_id")
+    job_id = params.get("job_id")
+    run_id = params.get("run_id")
 
     if not project_id:
-        return {
-            "success": False,
-            "message": "project_id is required either in config or params",
-            "data": None
-        }
-
+        return {"success": False, "message": "project_id is required"}
     if not job_id:
-        return {
-            "success": False,
-            "message": "job_id is required in params",
-            "data": None
-        }
-
+        return {"success": False, "message": "job_id is required"}
     if not run_id:
-        return {
-            "success": False,
-            "message": "run_id is required in params",
-            "data": None
-        }
+        return {"success": False, "message": "run_id is required"}
 
-    # Format host URL
-    host = config.get('host', '')
-    if not host:
-        return {
-            "success": False,
-            "message": "host is required in config",
-            "data": None
-        }
-
-    # Ensure the host has the correct scheme and no trailing slash
-    parsed_url = urlparse(host)
-    if not parsed_url.scheme:
-        host = 'https://' + host
-    elif host.startswith('http://'):
-        host = 'https://' + host[7:]
-
-    host = host.rstrip('/')
-
-    # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}/runs/{run_id}:stop"
-    
-    print(f"Accessing: {url}")
-
-    # Setup headers
-    headers = {
-        "Authorization": f"Bearer {config.get('api_key', '')}",
-        "Content-Type": "application/json"
-    }
-
-    # Execute the request
     try:
-        response = requests.post(url, headers=headers, timeout=30)
-
-        if response.status_code >= 400:
-            return {
-                "success": False,
-                "message": f"Failed to execute request: HTTP {response.status_code}",
-                "data": None
-            }
-
-        try:
-            data = response.json()
-            return {
-                "success": True,
-                "message": f"Successfully stopped job run {run_id}",
-                "data": data
-            }
-        except json.JSONDecodeError:
-            return {
-                "success": False,
-                "message": f"Failed to parse response as JSON: {response.text}",
-                "data": None
-            }
-    except requests.RequestException as e:
+        client = setup_client(config["host"], config["api_key"])
+        result = client.stop_job_run(project_id, job_id, run_id)
         return {
-            "success": False,
-            "message": f"Failed to execute request: {str(e)}",
-            "data": None
+            "success": True,
+            "message": f"Successfully stopped job run '{run_id}'",
+            "data": serialize_result(result),
         }
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"An unexpected error occurred: {str(e)}",
-            "data": None
-        } 
+        return {"success": False, "message": f"Error stopping job run: {str(e)}"}

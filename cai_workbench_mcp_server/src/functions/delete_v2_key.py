@@ -1,33 +1,23 @@
-"""Delete one API v2 key."""
+"""Delete an API v2 key in Cloudera AI."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
 def delete_v2_key(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Delete one API v2 key."""
+    params = params or {}
+    username = params.get("username")
+    key_id = params.get("key_id")
+    if not username:
+        return {"success": False, "message": "username is required"}
+    if not key_id:
+        return {"success": False, "message": "key_id is required"}
     try:
-        user = params.get("username")
-        kid = params.get("key_id")
-        if not user or not kid:
-            return {"success": False, "message": "Missing username or key_id"}
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        from urllib.parse import quote
-
-        r = requests.delete(
-            f"{host}/api/v2/users/{quote(user, safe='')}/v2_keys/{kid}",
-            headers=auth_headers(api_key),
-            timeout=60,
-        )
-        r.raise_for_status()
-        try:
-            data = r.json() if r.text else {}
-        except Exception:
-            data = {"raw": r.text}
-        return {"success": True, "message": "delete_v2_key ok", "data": data}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.delete_v2_key(username, key_id)
+        return {"success": True, "message": f"Successfully deleted key '{key_id}'", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("delete_v2_key", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

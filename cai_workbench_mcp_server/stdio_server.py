@@ -422,7 +422,7 @@ def create_job_tool(name: str, script: str, kernel: str = "python3",
         "nvidia_gpu": nvidia_gpu,
         "runtime_identifier": runtime_identifier
     })
-    return result
+    return json.dumps(result, indent=2)
 
 @mcp.tool()
 def list_jobs_tool(project_id: str = None) -> str:
@@ -440,7 +440,7 @@ def list_jobs_tool(project_id: str = None) -> str:
         config["project_id"] = project_id
         
     result = list_jobs(config, {})
-    return result
+    return json.dumps(result, indent=2)
 
 @mcp.tool()
 def get_job_tool(job_id: str, project_id: str = None) -> str:
@@ -542,7 +542,7 @@ def delete_job_tool(job_id: str, project_id: str = None) -> str:
         config["project_id"] = project_id
         
     result = delete_job(config, {"job_id": job_id})
-    return result
+    return json.dumps(result, indent=2)
 
 @mcp.tool()
 def delete_all_jobs_tool(project_id: str = None) -> str:
@@ -560,7 +560,7 @@ def delete_all_jobs_tool(project_id: str = None) -> str:
         config["project_id"] = project_id
         
     result = delete_all_jobs(config, {})
-    return result
+    return json.dumps(result, indent=2)
 
 @mcp.tool()
 def create_job_run_tool(project_id: str, job_id: str, 
@@ -2052,7 +2052,21 @@ def list_registered_models_tool(search_filter: str = None, sort: str = None, pag
 @mcp.tool()
 def create_registered_model_tool(project_id: str, experiment_id: str, run_id: str, model_path: str, model_name: str, tags: str = None, description: str = None, notes: str = None, visibility: str = None) -> str:
     """
-    create_registered_model tool.
+    Register a model.
+
+    Args:
+        project_id: ID of the project
+        experiment_id: ID of the experiment the run belongs to
+        run_id: ID of the ExperimentRun (must be FINISHED with model artifacts)
+        model_path: MLflow artifact path used when logging the model (e.g. "model")
+        model_name: Name for the registered model
+        tags: JSON array string of tags, e.g. '[{"key":"env","value":"prod"}]' (optional)
+        description: Registered model description (optional)
+        notes: Registered model version notes (optional)
+        visibility: Model visibility - "PRIVATE" or "PUBLIC" (optional)
+
+    Returns:
+        JSON string with registered model data
     """
     config = get_config()
     

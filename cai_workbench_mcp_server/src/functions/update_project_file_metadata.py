@@ -1,128 +1,28 @@
-"""Function to update metadata of a file in a Cloudera AI project."""
+"""Update project file metadata in Cloudera AI."""
 
-import json
-import os
-import requests
-from urllib.parse import urlparse, quote
+from typing import Any, Dict
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
-
-def update_project_file_metadata(config, params=None):
-    """
-    Update metadata of a file in a Cloudera AI project.
-
-    Args:
-        config (dict): MCP configuration.
-        params (dict, optional): Parameters for the API call. Default is None.
-            - project_id (str, optional): ID of the project.
-                If not provided, it will be taken from the configuration.
-            - file_path (str): Path of the file relative to the project root.
-            - description (str, optional): New description for the file.
-            - hidden (bool, optional): Whether the file should be hidden.
-
-    Returns:
-        dict: Response with the following structure:
-            {
-                "success": bool,
-                "message": str,
-                "data": dict  # Result data if successful, otherwise None
-            }
-    """
+def update_project_file_metadata(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Update metadata of a project file."""
     params = params or {}
-    project_id = params.get('project_id') or config.get('project_id')
-    file_path = params.get('file_path')
-
+    project_id = params.get("project_id") or config.get("project_id")
+    file_path = params.get("file_path")
     if not project_id:
-        return {
-            "success": False,
-            "message": "project_id is required either in config or params",
-            "data": None
-        }
-
+        return {"success": False, "message": "project_id is required"}
     if not file_path:
-        return {
-            "success": False,
-            "message": "file_path is required in params",
-            "data": None
-        }
-
-    # Format host URL
-    host = config.get('host', '')
-    if not host:
-        return {
-            "success": False,
-            "message": "host is required in config",
-            "data": None
-        }
-
-    # Ensure the host has the correct scheme and no trailing slash
-    parsed_url = urlparse(host)
-    if not parsed_url.scheme:
-        host = 'https://' + host
-    elif host.startswith('http://'):
-        host = 'https://' + host[7:]
-
-    host = host.rstrip('/')
-
-    # URL encode the file path
-    encoded_file_path = quote(file_path, safe='')
-
-    # Build the API URL
-    url = f"{host}/api/v2/projects/{project_id}/files/{encoded_file_path}/metadata"
-    
-    print(f"Accessing: {url}")
-
-    # Prepare request data
-    request_data = {}
-    
-    # Add optional parameters to request data
-    for key in ['description', 'hidden']:
-        if params.get(key) is not None:
-            request_data[key] = params[key]
-    
-    # Prepare headers with API key
-    headers = {
-        "Authorization": f"Bearer {config.get('api_key', '')}",
-        "Content-Type": "application/json"
-    }
-
-    # Execute the PATCH request using requests library (secure)
+        return {"success": False, "message": "file_path is required"}
+    body = {}
+    if params.get("description"):
+        body["description"] = params["description"]
+    if params.get("hidden") is not None:
+        body["hidden"] = params["hidden"]
     try:
-        response = requests.patch(
-            url,
-            headers=headers,
-            json=request_data,
-            timeout=30
-        )
-
-        if response.status_code >= 400:
-            return {
-                "success": False,
-                "message": f"API request failed with status {response.status_code}: {response.text}",
-                "data": None
-            }
-
-        try:
-            data = response.json()
-            return {
-                "success": True,
-                "message": f"Successfully updated metadata for file {file_path}",
-                "data": data
-            }
-        except json.JSONDecodeError:
-            return {
-                "success": False,
-                "message": f"Failed to parse response as JSON: {response.text}",
-                "data": None
-            }
-    except requests.RequestException as e:
-        return {
-            "success": False,
-            "message": f"API request error: {str(e)}",
-            "data": None
-        }
+        client = setup_client(config["host"], config["api_key"])
+        result = client.update_project_file_metadata(body, project_id, file_path)
+        return {"success": True, "message": f"Successfully updated file metadata for '{file_path}'", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"An unexpected error occurred: {str(e)}",
-            "data": None
-        } 
+        return {"success": False, "message": f"Error: {str(e)}"}

@@ -1,30 +1,20 @@
-"""Delete a runtime repo."""
+"""Delete a runtime repo in Cloudera AI."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
 def delete_runtime_repo(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Delete a runtime repo."""
+    params = params or {}
+    runtime_repo_id = params.get("runtime_repo_id")
+    if not runtime_repo_id:
+        return {"success": False, "message": "runtime_repo_id is required"}
     try:
-        rid = params.get("runtime_repo_id")
-        if rid is None:
-            return {"success": False, "message": "Missing runtime_repo_id"}
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.delete(
-            f"{host}/api/v2/runtimerepos/{rid}",
-            headers=auth_headers(api_key),
-            timeout=60,
-        )
-        r.raise_for_status()
-        try:
-            data = r.json() if r.text else {}
-        except Exception:
-            data = {"raw": r.text}
-        return {"success": True, "message": "delete_runtime_repo ok", "data": data}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.delete_runtime_repo(int(runtime_repo_id))
+        return {"success": True, "message": f"Successfully deleted runtime repo '{runtime_repo_id}'", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("delete_runtime_repo", e)
+        return {"success": False, "message": f"Error: {str(e)}"}

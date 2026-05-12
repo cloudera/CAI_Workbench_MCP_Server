@@ -1,86 +1,24 @@
-"""Download a project file. function for Cloudera AI Workbench MCP"""
+"""Download a project file in Cloudera AI."""
 
-import requests
-import json
-from typing import Dict, Any
+from typing import Any, Dict
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client
 
 def download_project_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Download a project file.
-    
-    Args:
-        config: MCP configuration with host and api_key
-        params: Function parameters
-            - project_id (required)
-            - path (required)
-        
-    Returns:
-        download_project_file results
-    """
+    """Download a file from a project."""
+    params = params or {}
+    project_id = params.get("project_id") or config.get("project_id")
+    path = params.get("path")
+    if not project_id:
+        return {"success": False, "message": "project_id is required"}
+    if not path:
+        return {"success": False, "message": "path is required"}
     try:
-        # Validate required parameters
-        required_params = ['project_id', 'path']
-        missing_params = [p for p in required_params if p not in params or not params[p]]
-        if missing_params:
-            return {"success": False, "message": f"Missing required parameters: {', '.join(missing_params)}"}
-            
-        # Format host URL correctly
-        host = config.get("host", "").strip()
-        if host.startswith("https://https://"):
-            host = host.replace("https://https://", "https://")
-        if not host.startswith(("http://", "https://")):
-            host = "https://" + host
-        host = host.rstrip("/")
-        
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-            
-
-        
-        # Build the URL for the request
-        api_url = f"{host}/api/v2/projects/{params['project_id']}/files/{params['path']}:download"
-
-        
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Make the request
-        response = requests.post(api_url, headers=headers)
-        response.raise_for_status()
-        
-        # Parse the response
-        try:
-            data = response.json()
-        except:
-            data = {"message": "Success", "text": response.text}
-        
-        return {
-            "success": True,
-            "message": "Successfully executed download_project_file",
-            "data": data
-        }
-        
-    except requests.exceptions.RequestException as e:
-        error_message = str(e)
-        response_body = ""
-        if hasattr(e, 'response') and e.response is not None:
-            try:
-                response_body = e.response.json()
-                error_message = f"{error_message} - {json.dumps(response_body)}"
-            except:
-                if hasattr(e.response, 'text'):
-                    response_body = e.response.text
-                    error_message = f"{error_message} - {response_body}"
-        
-        return {
-            "success": False,
-            "message": f"API request error: {error_message}"
-        }
+        client = setup_client(config["host"], config["api_key"])
+        result = client.download_project_file(project_id, path)
+        content = result if isinstance(result, str) else str(result)
+        return {"success": True, "message": f"Successfully downloaded '{path}'", "data": {"content": content, "path": path}}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error executing download_project_file: {str(e)}"
-        }
+        return {"success": False, "message": f"Error: {str(e)}"}

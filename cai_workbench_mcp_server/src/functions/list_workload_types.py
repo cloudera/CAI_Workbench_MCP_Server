@@ -1,19 +1,17 @@
-"""List workload types."""
+"""Cloudera AI: list_workload_types."""
 
-import requests
 from typing import Any, Dict
-
-from .http_helpers import auth_headers, normalize_host, request_error
-
+from cmlapi.rest import ApiException
+from .http_helpers import setup_client, serialize_result
 
 def list_workload_types(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
+    """list_workload_types."""
+    params = params or {}
     try:
-        host = normalize_host(config.get("host", ""))
-        api_key = config.get("api_key")
-        if not api_key:
-            return {"success": False, "message": "Missing api_key in configuration"}
-        r = requests.get(f"{host}/api/v2/workloadtypes", headers=auth_headers(api_key), timeout=60)
-        r.raise_for_status()
-        return {"success": True, "message": "list_workload_types ok", "data": r.json()}
+        client = setup_client(config["host"], config["api_key"])
+        result = client.list_workload_types()
+        return {"success": True, "message": "list_workload_types ok", "data": serialize_result(result)}
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return request_error("list_workload_types", e)
+        return {"success": False, "message": f"Error: {str(e)}"}
