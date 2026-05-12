@@ -1,136 +1,49 @@
-"""
-Create a run for an existing job in Cloudera AI
-"""
-import os
+"""Create a job run in Cloudera AI."""
+
 import json
-import requests
-from urllib.parse import urlparse
-from typing import Dict, Any
+from typing import Any, Dict
+
+try:
+    from cmlapi.rest import ApiException
+except ImportError:
+    class ApiException(Exception):
+        """Placeholder when cmlapi is not installed."""
+        status = None
+        body = None
+
+from .http_helpers import setup_client, serialize_result
+
 
 def create_job_run(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Create a run for an existing job in Cloudera AI
-    
-    Args:
-        config: MCP configuration with host and api_key
-        params: Parameters for the API call:
-            - project_id: ID of the project (required)
-            - job_id: ID of the job to run (required)
-            - runtime_identifier: Runtime identifier (optional)
-            - environment_variables: Dictionary of environment variables (optional)
-            - override_config: Dictionary with configuration overrides (optional)
-    
-    Returns:
-        Dict with success flag, message, and job run data
-    """
-    # Debug prints
-    print(f"config type: {type(config)}")
-    print(f"config contents: {config}")
-    print(f"params type: {type(params)}")
-    print(f"params contents: {params}")
-    
-    # Validate required parameters
-    required_params = ["project_id", "job_id"]
-    missing_params = [p for p in required_params if p not in params or not params[p]]
-    if missing_params:
-        return {"success": False, "message": f"Missing required parameters: {', '.join(missing_params)}"}
-    
-    # Format host URL correctly
-    host = config.get("host", "")
-    if not host:
-        return {"success": False, "message": "Missing host in configuration"}
-    
-    # Make sure host has the correct scheme
-    parsed_url = urlparse(host)
-    if not parsed_url.scheme:
-        host = "https://" + host
-    elif parsed_url.scheme and "://" in host[len(parsed_url.scheme)+3:]:
-        # Fix potential double https:// in the URL
-        host = parsed_url.scheme + "://" + host.split("://")[-1]
-    
-    # Remove trailing slash if present
-    if host.endswith('/'):
-        host = host[:-1]
-    
-    api_key = config.get("api_key")
-    if not api_key:
-        return {"success": False, "message": "Missing api_key in configuration"}
-    
-    # Build the request data
-    request_data = {}
-    
-    # Add optional parameters if provided
-    optional_params = {
-        "runtime_identifier": "runtime_identifier",
-        "environment_variables": "environment_variables",
-        "override_config": "override_config"
-    }
-    
-    for param_key, request_key in optional_params.items():
-        if param_key in params and params[param_key] is not None:
-            request_data[request_key] = params[param_key]
-    
-    # Debug print URLs
-    project_id = params["project_id"]
-    job_id = params["job_id"]
-    api_url = f"{host}/api/v2/projects/{project_id}/jobs/{job_id}/runs"
-    print(f"Creating job run with URL: {api_url}")
-    
-    # Setup headers
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
+    """Create a run for an existing job."""
+    params = params or {}
+    project_id = params.get("project_id") or config.get("project_id")
+    job_id = params.get("job_id")
+
+    if not project_id:
+        return {"success": False, "message": "project_id is required"}
+    if not job_id:
+        return {"success": False, "message": "job_id is required"}
+
+    body = {}
+    if params.get("runtime_identifier"):
+        body["runtime_identifier"] = params["runtime_identifier"]
+    if params.get("environment_variables"):
+        env = params["environment_variables"]
+        body["environment_variables"] = json.loads(env) if isinstance(env, str) else env
+    if params.get("override_config"):
+        oc = params["override_config"]
+        body["override_config"] = json.loads(oc) if isinstance(oc, str) else oc
+
     try:
-        # Make POST request
-        response = requests.post(api_url, headers=headers, json=request_data, timeout=30)
-        
-        # Check if request was successful
-        if response.status_code >= 400:
-            try:
-                error_data = response.json()
-                return {
-                    "success": False,
-                    "message": f"API error: {error_data.get('error', {}).get('message', 'Unknown error')}",
-                    "details": error_data.get("error", {})
-                }
-            except:
-                return {
-                    "success": False,
-                    "message": f"Failed to create job run: HTTP {response.status_code}"
-                }
-        
-        # Parse the response
-        try:
-            response_data = response.json()
-            
-            # Check if there's an error in the response
-            if "error" in response_data:
-                return {
-                    "success": False,
-                    "message": f"API error: {response_data.get('error', {}).get('message', 'Unknown error')}",
-                    "details": response_data.get("error", {})
-                }
-            
-            return {
-                "success": True,
-                "message": f"Successfully created run for job '{job_id}'",
-                "data": response_data
-            }
-        except json.JSONDecodeError:
-            return {
-                "success": False,
-                "message": f"Failed to parse response: {response.text}"
-            }
-    
-    except requests.RequestException as e:
+        client = setup_client(config["host"], config["api_key"])
+        result = client.create_job_run(body, project_id, job_id)
         return {
-            "success": False,
-            "message": f"Error creating job run: {str(e)}"
+            "success": True,
+            "message": f"Successfully created job run for job '{job_id}'",
+            "data": serialize_result(result),
         }
+    except ApiException as e:
+        return {"success": False, "message": f"API error: {e.status} - {e.body}"}
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error creating job run: {str(e)}"
-        } 
+        return {"success": False, "message": f"Error creating job run: {str(e)}"}

@@ -8,6 +8,9 @@ Note: These tests use mock project IDs. For real testing with actual Cloudera AI
 - Use real project IDs in format: xxxx-xxxx-xxxx-xxxx (e.g., "9er0-ooi9-uopm-8i8o")
 """
 
+from fastmcp.client.transports import FastMCPTransport
+
+
 import asyncio
 import json
 import sys
@@ -17,6 +20,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastmcp import Client
+from fastmcp.client.transports import FastMCPTransport
 from cai_workbench_mcp_server.stdio_server import mcp
 
 
@@ -49,7 +53,7 @@ async def test_server_basics():
         print(f"✅ Found {len(tools)} tools")
         
         # Verify we have the expected number
-        assert len(tools) == 47, f"Expected 47 tools, found {len(tools)}"
+        assert len(tools) == 104, f"Expected 104 tools, found {len(tools)}"
         print("✅ Tool count verified")
 
 
@@ -57,14 +61,14 @@ async def test_system_tools():
     """Test system information tools (work without credentials)"""
     print("\n🔍 Testing System Tools")
     print("=" * 50)
-    
+
     client = Client(mcp)
-    
+
     async with client:
-        # Test get_runtimes_tool - should work without credentials
-        print("\n📌 get_runtimes_tool:")
+        # Test list_runtimes_tool - should work without credentials
+        print("\n📌 list_runtimes_tool:")
         try:
-            result = await client.call_tool("get_runtimes_tool", {})
+            result = await client.call_tool("list_runtimes_tool", {})
             # FastMCP returns the result as a list of content items
             if hasattr(result, 'content') and result.content:
                 # result.content is a list of items
@@ -78,9 +82,9 @@ async def test_system_tools():
                 print(f"  Result type: {type(result)}")
                 print(f"  Result dir: {[attr for attr in dir(result) if not attr.startswith('_')]}")
                 return
-            
+
             if data.get("success"):
-                print(f"  ✅ Found {len(data.get('runtimes', []))} runtimes")
+                print(f"  ✅ Listed runtimes successfully")
             else:
                 print(f"  ℹ️  {data.get('message', 'No runtimes found')}")
         except Exception as e:
@@ -304,10 +308,10 @@ async def quick_smoke_test():
         
         # Try one tool that should work without config
         try:
-            result = await client.call_tool("get_runtimes_tool", {})
+            result = await client.call_tool("list_runtimes_tool", {})
             data = parse_tool_result(result)
             if data:
-                print(f"✅ Tool execution works - got {len(data.get('runtimes', []))} runtimes")
+                print(f"✅ Tool execution works - listed runtimes")
             else:
                 print(f"✅ Tool execution works (result type: {type(result)})")
         except Exception as e:

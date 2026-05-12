@@ -6,7 +6,11 @@ Comprehensive test suite for all CAI Workbench MCP Server functions, suitable fo
 
 ### `test_all_functions.py` - Comprehensive Unit Test Suite ⭐
 
-**Main test suite covering all 47+ functions in the repository** - CI/CD Ready
+**Main test suite covering all 105 functions in the repository** - CI/CD Ready
+
+### `test_create_registered_model.py` - Registry unit tests
+
+Mocks HTTP and verifies **`create_registered_model`** parses **`tags`** JSON strings for the registry API.
 
 ### `test_cai_mcp_client.py` - FastMCP Integration Test Suite ⭐
 
@@ -17,7 +21,7 @@ This test file uses the FastMCP client with in-memory transport to test the actu
 #### Integration Test Categories:
 
 1. **Server Basics**
-   - `test_server_basics`: Tests connectivity and tool discovery (47 tools)
+   - `test_server_basics`: Tests connectivity and tool discovery (105 tools)
 
 2. **System Tools**
    - `test_system_tools`: Tests get_runtimes_tool (works without credentials)
@@ -104,7 +108,7 @@ uv run pytest tests/ --junit-xml=test-results.xml
 
 ## Test Coverage
 
-### Functions Tested (47+ total):
+### Functions Tested (105 total):
 
 **Create Operations:**
 - create_application, create_experiment, create_experiment_run, create_job
@@ -159,13 +163,10 @@ export CAI_WORKBENCH_PROJECT_ID="your-project-id"
 ## Test Requirements
 
 ### Dependencies
-All test dependencies are included in `pyproject.toml`:
-```toml
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-]
+Install dev dependencies (including `pytest` and `pytest-asyncio`):
+
+```bash
+uv sync --group dev
 ```
 
 ### Python Version

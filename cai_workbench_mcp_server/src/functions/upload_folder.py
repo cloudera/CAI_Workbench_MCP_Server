@@ -8,42 +8,7 @@ from pathlib import Path
 import requests
 from typing import Dict, Any, List, Optional
 
-
-def setup_client(host, api_key):
-    """
-    Setup the CAI Workbench API client
-    
-    Args:
-        host: CAI Workbench host URL
-        api_key: API key for authentication
-        
-    Returns:
-        Configured CAI Workbench API client
-    """
-    # Lazy import cmlapi (optional dependency, only needed when function is called)
-    try:
-        import cmlapi
-    except ImportError:
-        raise ImportError(
-            "cmlapi is required for upload_folder. "
-            "Install it from your Cloudera AI instance as described in the README."
-        )
-    # Properly format the host URL
-    host = host.strip()
-    # Remove duplicate https:// if present
-    if host.startswith("https://https://"):
-        host = host.replace("https://https://", "https://")
-    # Ensure URL has a scheme
-    if not host.startswith(("http://", "https://")):
-        host = "https://" + host
-    # Remove trailing slash if present
-    host = host.rstrip("/")
-    
-    config = cmlapi.Configuration()
-    config.host = host
-    api_client = cmlapi.ApiClient(config)
-    api_client.set_default_header("authorization", f"Bearer {api_key}")
-    return cmlapi.CMLServiceApi(api_client)
+from .http_helpers import setup_client, normalize_host
 
 
 def delete_file_if_exists(client, project_id, file_path):
@@ -152,16 +117,7 @@ def upload_folder(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, A
         if not folder_path_obj.exists() or not folder_path_obj.is_dir():
             raise ValueError(f"{folder_path} is not a valid directory")
         
-        # Properly format the host URL
-        host = config['host'].strip()
-        # Remove duplicate https:// if present
-        if host.startswith("https://https://"):
-            host = host.replace("https://https://", "https://")
-        # Ensure URL has a scheme
-        if not host.startswith(("http://", "https://")):
-            host = "https://" + host
-        # Remove trailing slash if present
-        host = host.rstrip("/")
+        host = normalize_host(config['host'])
         
         successful_uploads = []
         failed_uploads = []

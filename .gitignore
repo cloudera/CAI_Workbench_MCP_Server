@@ -23,6 +23,7 @@ wheels/
 
 # Environment and secrets
 .env
+.mcp.json
 secrets/
 
 # IDE
