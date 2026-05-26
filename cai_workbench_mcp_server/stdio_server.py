@@ -2510,13 +2510,47 @@ def list_all_accelerator_node_labels_tool() -> str:
     return json.dumps(list_all_accelerator_node_labels(get_config(), {}), indent=2)
 
 
+def _install_cmlapi(host: str) -> bool:
+    """Attempt to install cmlapi from the cluster at runtime."""
+    import subprocess
+    domain = host.replace("https://", "").replace("http://", "").rstrip("/")
+    url = f"https://{domain}/api/v2/python.tar.gz"
+    print(f"cmlapi not found — attempting auto-install from {url}", file=sys.stderr)
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", url, "--trusted-host", domain],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        print("cmlapi installed successfully.", file=sys.stderr)
+        return True
+    print(f"Auto-install failed: {result.stderr.strip()}", file=sys.stderr)
+    return False
+
+
 def main():
     """Main entry point for the Cloudera AI Workbench MCP STDIO server."""
+    # cmlapi is not on PyPI — install from the cluster if missing.
+    try:
+        import cmlapi  # noqa: F401
+    except ImportError:
+        host = os.environ.get("CAI_WORKBENCH_HOST", "")
+        installed = False
+        if host:
+            installed = _install_cmlapi(host)
+        if not installed:
+            print("Error: 'cmlapi' is not installed and could not be auto-installed.", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("Install it manually from your Cloudera AI / PvC cluster:", file=sys.stderr)
+            print("  uv pip install \"https://<CDSW_DOMAIN>/api/v2/python.tar.gz\" --trusted-host <CDSW_DOMAIN>", file=sys.stderr)
+            print("Do NOT run 'pip install cmlapi' — that package does not exist on PyPI.", file=sys.stderr)
+            exit(1)
+
     # Check required configuration
     config = get_config()
     required_config = ["host", "api_key"]
     missing = [k for k in required_config if not config.get(k)]
-    
+
     if missing:
         print(f"Error: Missing required configuration: {', '.join(missing)}", file=sys.stderr)
         print("", file=sys.stderr)
@@ -2525,13 +2559,13 @@ def main():
         print("  CAI_WORKBENCH_API_KEY=your-api-key", file=sys.stderr)
         print("  CAI_WORKBENCH_PROJECT_ID=your-project-id  # Optional", file=sys.stderr)
         exit(1)
-    
+
     # For STDIO, only log to stderr
     print(f"Starting Cloudera AI Workbench MCP Server (STDIO mode)...", file=sys.stderr)
     print(f"Connected to: {config['host']}", file=sys.stderr)
-    print("105 tools available", file=sys.stderr)
-    print("🔒 Secure Transport: Using environment variables for authentication", file=sys.stderr)
-    
+    print("104 tools available", file=sys.stderr)
+    print("Secure Transport: Using environment variables for authentication", file=sys.stderr)
+
     # Run STDIO server (default transport)
     mcp.run()
 
