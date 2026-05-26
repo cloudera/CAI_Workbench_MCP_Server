@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any, Dict
 
 import requests
+
+_SESSION_CA_CERT = "/etc/ssl/certs/ca-certificates.crt"
 
 
 def normalize_host(host: str) -> str:
@@ -30,6 +33,9 @@ def setup_client(host: str, api_key: str):
     import cmlapi
     config = cmlapi.Configuration()
     config.host = normalize_host(host)
+    # Use system CA bundle when present (required on PvC/Docker Linux environments)
+    if os.path.exists(_SESSION_CA_CERT):
+        config.ssl_ca_cert = _SESSION_CA_CERT
     api_client = cmlapi.ApiClient(config)
     api_client.set_default_header("authorization", f"Bearer {api_key}")
     return cmlapi.CMLServiceApi(api_client)
