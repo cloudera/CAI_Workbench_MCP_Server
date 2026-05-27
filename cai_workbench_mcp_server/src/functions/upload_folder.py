@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from typing import Dict, Any, List, Optional
 
-from .http_helpers import setup_client, normalize_host
+from .http_helpers import setup_client, normalize_host, requests_verify
 
 
 def delete_file_if_exists(client, project_id, file_path):
@@ -67,7 +67,8 @@ def upload_file_to_project(host, api_key, project_id, file_path, relative_path):
             response = requests.put(
                 upload_url,
                 headers=headers,
-                files=files
+                files=files,
+                verify=requests_verify(),
             )
         
         # Check the response
