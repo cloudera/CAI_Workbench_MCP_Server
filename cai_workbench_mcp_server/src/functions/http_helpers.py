@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict
+import os
+import ssl
+from typing import Any, Dict, Union
 
 import requests
+
+_DEBIAN_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
 
 
 def normalize_host(host: str) -> str:
@@ -15,6 +19,27 @@ def normalize_host(host: str) -> str:
     if not h.startswith(("http://", "https://")):
         h = "https://" + h
     return h.rstrip("/")
+
+
+def system_ca_bundle() -> str | None:
+    """Return the system CA bundle path when one is available."""
+    for candidate in (
+        os.environ.get("SSL_CERT_FILE"),
+        os.environ.get("REQUESTS_CA_BUNDLE"),
+        _DEBIAN_CA_BUNDLE,
+    ):
+        if candidate and os.path.exists(candidate):
+            return candidate
+
+    default = ssl.get_default_verify_paths().cafile
+    if default and os.path.exists(default):
+        return default
+    return None
+
+
+def requests_verify() -> Union[str, bool]:
+    """CA bundle for requests; True keeps certifi default when no system bundle exists."""
+    return system_ca_bundle() or True
 
 
 def setup_client(host: str, api_key: str):
@@ -28,8 +53,12 @@ def setup_client(host: str, api_key: str):
         Ready-to-use CMLServiceApi instance.
     """
     import cmlapi
+
     config = cmlapi.Configuration()
     config.host = normalize_host(host)
+    ca_bundle = system_ca_bundle()
+    if ca_bundle:
+        config.ssl_ca_cert = ca_bundle
     api_client = cmlapi.ApiClient(config)
     api_client.set_default_header("authorization", f"Bearer {api_key}")
     return cmlapi.CMLServiceApi(api_client)
