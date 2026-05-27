@@ -3,7 +3,7 @@
 import os
 import requests
 from typing import Any, Dict
-from .http_helpers import normalize_host, auth_headers
+from .http_helpers import normalize_host, requests_verify
 
 def upload_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any]:
     """Upload a single file to a project."""
@@ -28,7 +28,9 @@ def upload_file(config: Dict[str, str], params: Dict[str, Any]) -> Dict[str, Any
     try:
         with open(file_path, "rb") as f:
             files_payload = {target_path: f}
-            response = requests.put(url, headers=headers, files=files_payload, timeout=60)
+            response = requests.put(
+                url, headers=headers, files=files_payload, timeout=60, verify=requests_verify()
+            )
         if response.status_code in (200, 201, 202, 204):
             return {"success": True, "message": f"Successfully uploaded file: {target_name}", "file_path": file_path, "target_name": target_name, "target_dir": target_dir, "target_path": target_path}
         return {"success": False, "message": f"Upload failed: HTTP {response.status_code} - {response.text}"}
