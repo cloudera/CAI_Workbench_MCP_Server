@@ -94,6 +94,7 @@ from .list_cpu_profiles import list_cpu_profiles
 from .list_groups_quota import list_groups_quota
 from .list_users_quota import list_users_quota
 from .list_teams_accelerator_quota import list_teams_accelerator_quota
+from .list_teams import list_teams
 from .list_users_accelerator_quota import list_users_accelerator_quota
 from .list_usage import list_usage
 from .list_news_feeds import list_news_feeds
@@ -201,6 +202,7 @@ __all__ = [
     "list_groups_quota",
     "list_users_quota",
     "list_teams_accelerator_quota",
+    "list_teams",
     "list_users_accelerator_quota",
     "list_usage",
     "list_news_feeds",

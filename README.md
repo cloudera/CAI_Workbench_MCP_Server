@@ -17,11 +17,12 @@ A Model Context Protocol (MCP) server for Cloudera AI workbench built with FastM
 2. **HTTP**: Simple HTTP API for development/testing (no authentication)
 
 ## Prerequisites
-- Python 3.10 or higher
-- Access to a Cloudera AI instance  
-- Valid Cloudera AI API key
-- `uv` package manager (for local development)
-- `cmlapi` SDK (installed from your Cloudera AI instance — see setup below)
+
+- Python 3.10+
+- A Cloudera AI instance and API key
+- `uv` / `uvx` ([install uv](https://docs.astral.sh/uv/getting-started/installation/))
+
+See [SETUP.md](./SETUP.md) for full installation options (Agent Studio, Cursor, local venv, Docker).
 
 ## Architecture
 
@@ -29,14 +30,9 @@ All API tools use the official **`cmlapi` Python SDK** (`CMLServiceApi`) rather 
 
 ## Quick Start
 
-### Option 1: Cloudera AI Environment(Agent Studio)
+Use **`uvx`** with **`--with`** to install `cmlapi` from your Cloudera AI instance at runtime. This works in [Agent Studio](https://docs.cloudera.com/machine-learning/cloud/use-ai-studios/topics/ml-agent-studio-overview.html), Cursor, and other MCP clients — no Docker required.
 
-The easiest way to use this MCP server is through [Cloudera Agent Studio](https://docs.cloudera.com/machine-learning/cloud/use-ai-studios/topics/ml-agent-studio-overview.html), which provides a managed environment for AI agents.
-
-#### Setup 
-
-1. **Navigate to Agent Studio** in your Cloudera AI workspace
-2. **Add MCP Server** in the configuration:
+Replace `ml-xxxx.cloudera.site`, `your-api-key`, and `your-project-id` with your values:
 
 ```json
 {
@@ -46,196 +42,27 @@ The easiest way to use this MCP server is through [Cloudera Agent Studio](https:
       "args": [
         "--from",
         "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git",
+        "--with",
+        "https://ml-xxxx.cloudera.site/api/v2/python.tar.gz",
         "cai-workbench-mcp-stdio"
       ],
       "env": {
-        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
-        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
-        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
+        "CAI_WORKBENCH_HOST": "https://ml-xxxx.cloudera.site",
+        "CAI_WORKBENCH_API_KEY": "your-api-key",
+        "CAI_WORKBENCH_PROJECT_ID": "your-project-id"
       }
     }
   }
 }
 ```
 
-3. **(Optional) Pin `uvx` to a branch, tag, or commit** — append `@ref` to the Git URL (pip / PEP 440 VCS URL syntax; `uvx --from git+…` follows the same rules):
+The `--with` argument is **required** — without it, API tools fail with `No module named 'cmlapi'`.
 
-```json
-{
-  "mcpServers": {
-    "cloudera-ai": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git@your-branch-name",
-        "cai-workbench-mcp-stdio"
-      ],
-      "env": {
-        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
-        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
-        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
-      }
-    }
-  }
-}
-```
-
-| Target | Example suffix on the repo URL |
-|--------|----------------------------------|
-| Branch | `...git@feature/my-branch` |
-| Tag | `...git@v1.2.3` |
-| Commit SHA | `...git@a1b2c3d4` |
-
-**`uvx` caches aggressively.** If you iterate on a branch, you may get a stale install. Force a fresh pull:
-
-```bash
-uvx --no-cache --from "git+https://github.com/cloudera/CAI_Workbench_MCP_Server.git@your-branch-name" cai-workbench-mcp-stdio
-```
-
-Or clear the cache:
-
-```bash
-uv cache clean
-```
-
-This matters when testing unreleased server-side or MCP changes on a dev branch—cached wheels can look like “wrong” behavior.
-
-4. **Set environment variables** in Agent Studio settings:
-   - `CAI_WORKBENCH_HOST`: Your Cloudera AI instance URL (e.g., `https://ml-xxxx.cloudera.site`)
-   - `CAI_WORKBENCH_API_KEY`: Your API key from Cloudera AI
-   - `CAI_WORKBENCH_PROJECT_ID`: Your default project ID (optional)
-
-5. **Save and test** - Your agent now has access to all **105** Cloudera AI workbench tools (use MCP `tools/list` for the current list).
-
-
-
-
-### Option 2: Docker
-
-Configure your Cloudera AI domain first - see [SETUP.md](./SETUP.md).
-
-```bash
-# Clone repository
-git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
-cd CAI_Workbench_MCP_Server
-
-# Configure your CAI domain in Makefile
-# Build and test
-make build
-make test
-make run
-```
-
-See [DOCKER.md](./DOCKER.md) for Docker documentation.
-
-### Option 4: Local Development
-
-#### 1. Clone and setup
-```bash
-git clone https://github.com/cloudera/CAI_Workbench_MCP_Server.git
-cd CAI_Workbench_MCP_Server
-uv sync
-```
-
-#### 2. Install Cloudera AI API Client
-```bash
-# Set your Cloudera AI domain
-export CDSW_DOMAIN="ml-xxxx.cloudera.site"  # Replace with your actual domain
-
-# Install cmlapi from your Cloudera AI instance
-uv pip install https://$CDSW_DOMAIN/api/v2/python.tar.gz
-```
-
-#### 3. Configure Environment Variables
-Create a `.env` file or export:
-
-```bash
-# Required
-export CAI_WORKBENCH_HOST="https://ml-xxxx.cloudera.site"
-export CAI_WORKBENCH_API_KEY="your-api-key"
-
-# Optional  
-export CAI_WORKBENCH_PROJECT_ID="your-default-project-id"
-```
-
-#### 4. Cursor / Claude Desktop `mcp.json` — local checkout (feature branch)
-
-Use this when you develop from a clone and want the server to run **from your working tree** (any branch, e.g. `update-tools-DSE-54632`). Replace the path with the **absolute** path to your repo.
-
-```json
-{
-  "mcpServers": {
-    "cai-workbench-local": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--directory",
-        "/ABSOLUTE/PATH/TO/CAI_Workbench_MCP_Server",
-        "-m",
-        "cai_workbench_mcp_server.stdio_server"
-      ],
-      "env": {
-        "CAI_WORKBENCH_HOST": "${CAI_WORKBENCH_HOST}",
-        "CAI_WORKBENCH_API_KEY": "${CAI_WORKBENCH_API_KEY}",
-        "CAI_WORKBENCH_PROJECT_ID": "${CAI_WORKBENCH_PROJECT_ID}"
-      }
-    }
-  }
-}
-```
-
-Run `uv sync` (and `uv sync --group dev` if you use dev tools) in that directory once so the environment exists. Switch branches in the clone as needed; restart the MCP server after you pull or change code. For **`uvx` from Git** (no clone), use the **`@branch` / `@tag` / `@commit`** form in **Option 1** above.
+For local venv, Docker, branch pinning, Cursor config, and troubleshooting, see **[SETUP.md](./SETUP.md)**.
 
 ## Usage
 
-### STDIO Mode (Recommended)
-
-Best for Claude Desktop and secure local usage:
-
-```bash
-# Run the STDIO server
-uv run -m cai_workbench_mcp_server.stdio_server
-
-# Or use the shortcut
-uvx --from . cai-workbench-mcp-stdio
-```
-
-#### Configure Claude Desktop
-
-Add to your Claude Desktop configuration:
-
-**Secure (Docker Secrets - Recommended):**
-```json
-{
-  "mcpServers": {
-    "cai_workbench_mcp": {
-      "command": "docker-compose",
-      "args": [
-        "-f", 
-        "/absolute/path/to/cai_workbench_mcp_server/docker-compose.secrets.yml",
-        "run", "--rm", "cai-workbench-mcp-server"
-      ]
-    }
-  }
-}
-```
-
-**Simple (Environment Variables):**
-```json
-{
-  "mcpServers": {
-    "cai_workbench_mcp": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "CAI_WORKBENCH_HOST=https://your-instance.site",
-        "-e", "CAI_WORKBENCH_API_KEY=your-api-key",
-        "cai-workbench-mcp-server"
-      ]
-    }
-  }
-}
-```
+STDIO mode (via `uvx` above) is recommended for Agent Studio, Cursor, and Claude Desktop. For local venv, Docker, and running from a checkout, see **[SETUP.md](./SETUP.md)**.
 
 ### HTTP Mode (Development Only)
 
@@ -304,7 +131,7 @@ The server exposes **105** tools. The authoritative list is whatever the running
 
 ### Project management
 - `list_projects_tool`, `get_project_id_tool`, `update_project_tool`
-- `create_project_tool`, `get_project_tool`, `delete_project_tool`, `list_project_names_tool`
+- `create_project_tool`, `get_project_tool`, `delete_project_tool`, `list_project_names_tool`, `list_teams_tool`
 - `list_project_collaborators_tool`, `add_project_collaborator_tool`, `delete_project_collaborator_tool`
 
 ### File operations
@@ -394,11 +221,7 @@ create_model_deployment_tool(
 
 ## Troubleshooting
 
-1. **"Missing required configuration"**: Set `CAI_WORKBENCH_HOST` and `CAI_WORKBENCH_API_KEY`
-2. **"No module named 'cmlapi'"**: Install from your instance: `uv pip install https://$CDSW_DOMAIN/api/v2/python.tar.gz`
-3. **"Object of type datetime is not JSON serializable"**: Ensure you're on the latest code — `serialize_result()` handles this
-4. **HTTP connection issues**: Ensure server is running on correct port
-5. **Tool not found**: Check tool name spelling (use MCP `tools/list`)
+See **[SETUP.md — Common issues](./SETUP.md#common-issues)** for `cmlapi`, SSL, Docker, and authentication problems.
 
 ## Security Notes
 
