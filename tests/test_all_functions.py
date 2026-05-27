@@ -112,6 +112,7 @@ from cai_workbench_mcp_server.src.functions.list_cpu_profiles import list_cpu_pr
 from cai_workbench_mcp_server.src.functions.list_groups_quota import list_groups_quota
 from cai_workbench_mcp_server.src.functions.list_users_quota import list_users_quota
 from cai_workbench_mcp_server.src.functions.list_teams_accelerator_quota import list_teams_accelerator_quota
+from cai_workbench_mcp_server.src.functions.list_teams import list_teams
 from cai_workbench_mcp_server.src.functions.list_users_accelerator_quota import list_users_accelerator_quota
 from cai_workbench_mcp_server.src.functions.list_usage import list_usage
 from cai_workbench_mcp_server.src.functions.list_news_feeds import list_news_feeds
@@ -247,6 +248,7 @@ def all_functions():
         (list_groups_quota, {}),
         (list_users_quota, {}),
         (list_teams_accelerator_quota, {}),
+        (list_teams, {}),
         (list_users_accelerator_quota, {}),
         (list_usage, {}),
         (list_news_feeds, {"category": "general"}),
@@ -584,6 +586,7 @@ def test_all_modules_import_successfully():
     import cai_workbench_mcp_server.src.functions.list_groups_quota
     import cai_workbench_mcp_server.src.functions.list_users_quota
     import cai_workbench_mcp_server.src.functions.list_teams_accelerator_quota
+    import cai_workbench_mcp_server.src.functions.list_teams
     import cai_workbench_mcp_server.src.functions.list_users_accelerator_quota
     import cai_workbench_mcp_server.src.functions.list_usage
     import cai_workbench_mcp_server.src.functions.list_news_feeds

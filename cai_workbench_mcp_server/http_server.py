@@ -105,6 +105,7 @@ from .src.functions.list_cpu_profiles import list_cpu_profiles
 from .src.functions.list_groups_quota import list_groups_quota
 from .src.functions.list_users_quota import list_users_quota
 from .src.functions.list_teams_accelerator_quota import list_teams_accelerator_quota
+from .src.functions.list_teams import list_teams
 from .src.functions.list_users_accelerator_quota import list_users_accelerator_quota
 from .src.functions.list_usage import list_usage
 from .src.functions.list_news_feeds import list_news_feeds
@@ -131,7 +132,8 @@ def get_config() -> Dict[str, str]:
     return {
         "host": read_secret_or_env("cai_workbench_host", "CAI_WORKBENCH_HOST"),
         "api_key": read_secret_or_env("cai_workbench_api_key", "CAI_WORKBENCH_API_KEY"),
-        "project_id": read_secret_or_env("cai_workbench_project_id", "CAI_WORKBENCH_PROJECT_ID")
+        "project_id": read_secret_or_env("cai_workbench_project_id", "CAI_WORKBENCH_PROJECT_ID"),
+        "team": read_secret_or_env("cai_workbench_team", "CAI_WORKBENCH_TEAM"),
     }
 
 
@@ -707,23 +709,30 @@ async def debug_call_tool(request):
 
 
 @mcp.tool()
-def create_project_tool(name: str, description: str = None, template: str = None, default_project_engine_type: str = None) -> str:
+def create_project_tool(
+    name: str,
+    description: str = None,
+    template: str = "blank",
+    default_project_engine_type: str = "ml_runtime",
+    team_name: str = None,
+) -> str:
     """
-    create_project tool.
+    Create a new Cloudera AI project.
+
+    Defaults to template='blank' (empty project) and ml_runtime engine type.
+    Use other templates only when you need a starter project (Python, R, git, etc.).
+
+    team_name: Team username for the project owner (CreateProjectRequest.team_name).
+    Use the team username (e.g. Team1), not the display name. Falls back to CAI_WORKBENCH_TEAM.
     """
     config = get_config()
-    
-    params_dict = {}
-    if name is not None:
-        params_dict['name'] = name
-    if description is not None:
-        params_dict['description'] = description
-    if template is not None:
-        params_dict['template'] = template
-    if default_project_engine_type is not None:
-        params_dict['default_project_engine_type'] = default_project_engine_type
 
-        
+    params_dict = {"name": name, "template": template, "default_project_engine_type": default_project_engine_type}
+    if description is not None:
+        params_dict["description"] = description
+    if team_name is not None:
+        params_dict["team_name"] = team_name
+
     result = create_project(config, params_dict)
     return json.dumps(result, indent=2)
 
@@ -1357,6 +1366,14 @@ def list_users_quota_tool(
         "search_filter": search_filter, "sort": sort, "page_size": page_size, "page_token": page_token
     }.items() if v is not None}
     return json.dumps(list_users_quota(get_config(), p), indent=2)
+
+
+@mcp.tool()
+def list_teams_tool(search_filter: str = None, page_size: int = None, page_token: str = None) -> str:
+    p = {k: v for k, v in {
+        "search_filter": search_filter, "page_size": page_size, "page_token": page_token
+    }.items() if v is not None}
+    return json.dumps(list_teams(get_config(), p), indent=2)
 
 
 @mcp.tool()
